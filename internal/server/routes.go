@@ -1,3 +1,4 @@
+// Package server provides a server to handle the HTTP requests
 package server
 
 import (
@@ -9,6 +10,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+// RegisterRoutes registers the routes for the server
 func (s *Server) RegisterRoutes() http.Handler {
 	e := echo.New()
 	e.Use(middleware.Logger())
@@ -26,6 +28,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	return e
 }
 
+// HelloWorldHandler is a handler that returns a simple message, used for testing purposes
 func (s *Server) HelloWorldHandler(c echo.Context) error {
 	resp := map[string]string{
 		"message": "Hello World",

@@ -1,3 +1,4 @@
+// Package database provides a service to connect and interact with the database
 package database
 
 import (
@@ -8,10 +9,11 @@ import (
 	"os"
 	"time"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
+	_ "github.com/jackc/pgx/v5/stdlib" // initialize pgx driver
 	_ "github.com/joho/godotenv/autoload"
 )
 
+// Service is an interface for the database service
 type Service interface {
 	Health() map[string]string
 }
@@ -28,6 +30,7 @@ var (
 	host     = os.Getenv("DB_HOST")
 )
 
+// New creates a new database service
 func New() Service {
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", username, password, host, port, database)
 	db, err := sql.Open("pgx", connStr)
@@ -38,6 +41,7 @@ func New() Service {
 	return s
 }
 
+// Health checks the health of the database, returns a map with a message or stops the application if the database is down
 func (s *service) Health() map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()

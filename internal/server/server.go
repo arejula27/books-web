@@ -1,3 +1,4 @@
+// Package server provides a server to handle the HTTP requests
 package server
 
 import (
@@ -7,17 +8,19 @@ import (
 	"strconv"
 	"time"
 
-	_ "github.com/joho/godotenv/autoload"
+	_ "github.com/joho/godotenv/autoload" // load .env file
 
 	"books/internal/database"
 )
 
+// Server is a struct that holds the server configuration
 type Server struct {
 	port int
 
 	db database.Service
 }
 
+// NewServer creates a new server instance
 func NewServer() *http.Server {
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
 	NewServer := &Server{

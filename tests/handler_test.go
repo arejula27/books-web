@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestHandler(t *testing.T) {
+func TestHelloHandler(t *testing.T) {
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	resp := httptest.NewRecorder()
