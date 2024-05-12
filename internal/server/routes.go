@@ -4,7 +4,7 @@ package server
 import (
 	"net/http"
 
-	"books/cmd/web"
+	"books/web"
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
