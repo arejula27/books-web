@@ -15,8 +15,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	fileServer := http.FileServer(http.FS(web.Files))
-	e.GET("/js/*", echo.WrapHandler(fileServer))
+	jsFileServer := http.FileServer(http.FS(web.Files))
+	e.GET("/js/*", echo.WrapHandler(jsFileServer))
+	cssFileServer := http.FileServer(http.FS(web.CSS))
+	e.GET("/css/*", echo.WrapHandler(cssFileServer))
 
 	e.GET("/web", echo.WrapHandler(templ.Handler(web.HelloForm())))
 	e.POST("/hello", echo.WrapHandler(http.HandlerFunc(web.HelloWebHandler)))
