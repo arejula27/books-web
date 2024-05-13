@@ -15,17 +15,16 @@ func (s *Server) RegisterRoutes() http.Handler {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	jsFileServer := http.FileServer(http.FS(web.Files))
+	jsFileServer := http.FileServer(http.FS(web.JS))
 	e.GET("/js/*", echo.WrapHandler(jsFileServer))
 	cssFileServer := http.FileServer(http.FS(web.CSS))
 	e.GET("/css/*", echo.WrapHandler(cssFileServer))
 
-	e.GET("/web", echo.WrapHandler(templ.Handler(web.HelloForm())))
+	e.GET("/", echo.WrapHandler(templ.Handler(web.HelloForm())))
 	e.POST("/hello", echo.WrapHandler(http.HandlerFunc(web.HelloWebHandler)))
 
-	e.GET("/", s.HelloWorldHandler)
-
-	e.GET("/health", s.healthHandler)
+	//TODO: Handle error if db is not connected
+	//e.GET("/health", s.healthHandler)
 
 	return e
 }
