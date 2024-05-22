@@ -22,22 +22,6 @@ docker-run:
 		docker-compose up; \
 	fi
 
-# Shutdown DB container
-docker-down:
-	@if docker compose down 2>/dev/null; then \
-		: ; \
-	else \
-		echo "Falling back to Docker Compose V1"; \
-		docker-compose down; \
-	fi
-
-docker-wipe:
-	@if docker compose down -v 2>/dev/null; then \
-		: ; \
-	else \
-		echo "Falling back to Docker Compose V1"; \
-		docker-compose down -v; \
-	fi
 # Test the application
 test:
 	@echo "Testing..."
