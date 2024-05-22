@@ -1,0 +1,35 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.10.7/.schema/devbox.schema.json",
+  "packages": [
+    "go@latest",
+    "postgresql@latest",
+  ],
+  "shell": {
+    "scripts": {
+      "build": [
+        "echo \"Building...\"",
+        "./bin/tailwindcss -i input.css -o web/css/app.css",
+        "templ generate",
+        "go build ./cmd/api/main.go"
+      ],
+      "run": [
+        "go run ./cmd/api/main.go"
+      ],
+      "test": [
+        "echo \"Testing...\"",
+        "go test ./tests -v"
+      ],
+      "clean": [
+        "echo \"Cleaning...\"",
+        "rm  -f main"],
+      "test": [
+        "echo \"Testing...\"",
+        "go test ./tests -v"
+      ],
+      "watch":[
+	    "air",
+	    "echo \"Watching...\"",
+      ]
+    }
+  }
+}
