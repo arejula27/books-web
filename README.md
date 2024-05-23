@@ -51,3 +51,12 @@ clean up binary from the last build
 ```bash
 make clean
 ```
+## Database
+Starting the database use:
+```bash
+devbox services up --background 
+```
+Stoping the database use:
+```bash
+devbox services down
+```
