@@ -18,6 +18,7 @@ import (
 type Service interface {
 	Health() map[string]string
 	AddUserIfNotExists(email, name, imageURL string) (models.User, error)
+	AddBook(book models.Book) (models.Book, error)
 }
 
 type service struct {
@@ -30,6 +31,7 @@ var (
 	username = os.Getenv("DB_USERNAME")
 	port     = os.Getenv("DB_PORT")
 	host     = os.Getenv("DB_HOST")
+	reset    = os.Getenv("DB_RESET")
 )
 
 // New creates a new database service
@@ -40,7 +42,11 @@ func New() Service {
 		log.Fatal(err)
 	}
 	s := &service{db: db}
-	s.createTable()
+	if reset == "true" {
+		log.Println("resetting database")
+		s.clearDatabase()
+	}
+	s.createTables()
 	return s
 }
 
@@ -62,7 +68,7 @@ func (s *service) Health() map[string]string {
 func (s *service) AddUserIfNotExists(email, name, imageURL string) (models.User, error) {
 	//check if user exists
 	user, err := s.getUserByEmail(email)
-	if nil != err {
+	if sql.ErrNoRows == err {
 		//if user does not exist insert user
 		user, err = s.insertUser(email, name, imageURL)
 		if nil != err {
@@ -71,4 +77,14 @@ func (s *service) AddUserIfNotExists(email, name, imageURL string) (models.User,
 	}
 	//if user exists return no error
 	return user, nil
+}
+func (s *service) AddBook(book models.Book) (models.Book, error) {
+	//insert book
+	book, err := s.insertBook(book)
+	if nil != err {
+		return models.Book{}, err
+	}
+	//return book
+	return book, nil
+
 }

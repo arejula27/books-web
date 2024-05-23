@@ -7,3 +7,10 @@ type User struct {
 	Email    string
 	ImageURL string
 }
+
+type Book struct {
+	ID        int
+	Title     string
+	Author    string
+	Editorial string
+}
