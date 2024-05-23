@@ -3,6 +3,7 @@ package database
 import (
 	"books/internal/models"
 	"context"
+	"log"
 	"time"
 )
 
@@ -24,35 +25,64 @@ const (
 		registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	);
 	`
+	createTableReviews = `
+	CREATE TABLE REVIEWS (
+		id SERIAL PRIMARY KEY,
+		book_id INT NOT NULL, 
+		user_id INT NOT NULL,
+		comment TEXT,
+		creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		CONSTRAINT fk_book
+			FOREIGN KEY(book_id) 
+				REFERENCES BOOKS(id)
+				ON DELETE CASCADE
+				ON UPDATE CASCADE,
+		CONSTRAINT fk_user
+			FOREIGN KEY(user_id)
+				REFERENCES USERS(id)
+				ON DELETE CASCADE
+				ON UPDATE CASCADE
+	);
+	`
 	insertUser = `INSERT INTO users (email, name, image_url) VALUES ($1, $2,$3) RETURNING id, email, name, image_url`
 	getUser    = "SELECT id, name, email, image_url  FROM users WHERE email = $1"
 	insertBook = `INSERT INTO books (title, author, editorial) VALUES ($1, $2, $3) RETURNING id`
 )
 
 func (s *service) clearDatabase() {
-	s.db.Exec("DROP TABLE IF EXISTS users")
-	s.db.Exec("DROP TABLE IF EXISTS books")
+	_, err := s.db.Exec("DROP TABLE IF EXISTS users")
+	if err != nil {
+		log.Println(err)
+	}
+	_, err = s.db.Exec("DROP TABLE IF EXISTS books")
+
+	if err != nil {
+		log.Println(err)
+	}
+	_, err = s.db.Exec("DROP TABLE IF EXISTS reviews")
+	if err != nil {
+		log.Println(err)
+	}
 }
 
-func (s *service) createTables() error {
-	tx, err := s.db.Begin()
-	if err != nil {
-		return err
-	}
+func (s *service) createTables() {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	_, err = s.db.ExecContext(ctx, createTableUsers)
+	// create users table
+	_, err := s.db.ExecContext(ctx, createTableUsers)
 	if err != nil {
-		tx.Rollback()
-		return err
+		log.Println("User table already exists")
 	}
+	// create books table
 	_, err = s.db.ExecContext(ctx, createTableBooks)
 	if err != nil {
-		tx.Rollback()
-		return err
+		log.Println("Books table already exists")
 	}
-	return tx.Commit()
-
+	_, err = s.db.ExecContext(ctx, createTableReviews)
+	if err != nil {
+		log.Fatal(err)
+		log.Println("Reviews table already exists")
+	}
 }
 
 func (s *service) insertUser(email, name, imageURL string) (models.User, error) {

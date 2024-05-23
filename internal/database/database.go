@@ -32,6 +32,7 @@ var (
 	port     = os.Getenv("DB_PORT")
 	host     = os.Getenv("DB_HOST")
 	reset    = os.Getenv("DB_RESET")
+	appEnv   = os.Getenv("APP_ENV")
 )
 
 // New creates a new database service
@@ -42,7 +43,7 @@ func New() Service {
 		log.Fatal(err)
 	}
 	s := &service{db: db}
-	if reset == "true" {
+	if reset == "true" && appEnv != "production" {
 		log.Println("resetting database")
 		s.clearDatabase()
 	}
