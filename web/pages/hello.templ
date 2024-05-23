@@ -1,10 +1,13 @@
-package web
+package pages
+
+import "books/web/layouts"
 
 templ HelloForm() {
-	@Base() {
-		<div class="bg-sky-200 p-4 text-sky-950">Hello Form</div>
+	@layouts.Base() {
+		<h1 class="bg-sky-200 p-4 text-sky-950">Hello Form</h1>
+		<h2>Enter your name:</h2>
 		<form hx-post="/hello" method="POST" hx-target="#hello-container">
-			<input id="name" name="name" type="text"/>
+			<input class="" id="name" name="name" type="text"/>
 			<button type="submit">Submit</button>
 		</form>
 		<div id="hello-container"></div>

@@ -1,6 +1,7 @@
 package web
 
 import (
+	"books/web/pages"
 	"net/http"
 )
 
@@ -11,6 +12,6 @@ func HelloWebHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	name := r.FormValue("name")
-	component := HelloPost(name)
+	component := pages.HelloPost(name)
 	component.Render(r.Context(), w)
 }
