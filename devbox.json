@@ -10,29 +10,16 @@
   "shell": {
     "scripts": {
       "build": [
-        "echo \"Building...\"",
-        "./bin/tailwindcss -i input.css -o web/css/app.css",
-        "templ generate",
-        "go build ./cmd/api/main.go",
+          "make build",
       ],
       "run": [
-        "go run ./cmd/api/main.go",
+        "make run"
       ],
       "test": [
-        "echo \"Testing...\"",
-        "go test ./tests -v",
-      ],
-      "clean": [
-        "echo \"Cleaning...\"",
-        "rm  -f main",
-      ],
-      "test": [
-        "echo \"Testing...\"",
-        "go test ./tests -v",
+        "make test"
       ],
       "watch": [
-        "air",
-        "echo \"Watching...\"",
+        "make watch",
       ],
     },
   },
