@@ -446,6 +446,38 @@ video {
   display: none;
 }
 
+@font-face{
+  font-family: 'Playfair Display';
+
+  font-style: normal;
+
+  font-weight: 500;
+
+  font-display: swap;
+
+  src: url('/fonts/PlayfairDisplay.ttf');
+}
+
+@font-face{
+  font-family: 'DM Sans';
+
+  font-style: normal;
+
+  font-weight: 400;
+
+  font-display: swap;
+
+  src: url('/fonts/DMSans.ttf');
+}
+
+html{
+  font-family: 'DM Sans', sans-serif;
+}
+
+h1,h2,h3,h4,h5,h6{
+  font-family: 'Playfair Display', serif;
+}
+
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -598,13 +630,28 @@ video {
   text-align: center;
 }
 
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
 .text-4xl {
   font-size: 2.25rem;
   line-height: 2.5rem;
 }
 
+.text-8xl {
+  font-size: 6rem;
+  line-height: 1;
+}
+
 .font-bold {
   font-weight: 700;
+}
+
+.text-gray-300 {
+  --tw-text-opacity: 1;
+  color: rgb(209 213 219 / var(--tw-text-opacity));
 }
 
 .text-green-600 {

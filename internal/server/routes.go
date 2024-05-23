@@ -24,7 +24,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	e.GET("/js/*", echo.WrapHandler(jsFileServer))
 	cssFileServer := http.FileServer(http.FS(web.CSS))
 	e.GET("/css/*", echo.WrapHandler(cssFileServer))
-
+	fontsFileServer := http.FileServer(http.FS(web.Fonts))
+	e.GET("/fonts/*", echo.WrapHandler(fontsFileServer))
 	// Public pages routes
 	e.GET("/", echo.WrapHandler(templ.Handler(pages.IndexPage())), redirectIfLogged)
 
