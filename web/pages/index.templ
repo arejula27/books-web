@@ -1,0 +1,17 @@
+package pages
+
+import "books/web/layouts"
+
+templ IndexPage() {
+	@layouts.Base() {
+		<div>
+			<h1 class="text-4xl text-green-600  text-center mt-12">Bienvenido a Books</h1>
+			<button
+				class="block bg-blue-500 text-white font-bold py-2 px-4 rounded mx-auto mt-6 hover:bg-blue-700"
+				onclick="window.location.href = '/auth/google';"
+			>
+				Log in with Google
+			</button>
+		</div>
+	}
+}
