@@ -10,7 +10,6 @@ import (
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/markbates/goth/gothic"
 )
 
 // RegisterRoutes registers the routes for the server
@@ -27,23 +26,13 @@ func (s *Server) RegisterRoutes() http.Handler {
 	e.GET("/css/*", echo.WrapHandler(cssFileServer))
 
 	// Public pages routes
-	e.GET("/", echo.WrapHandler(templ.Handler(pages.IndexPage())), func(next echo.HandlerFunc) echo.HandlerFunc {
-		//middleware to check if the user is already logged in and redirect to home page
-		return func(c echo.Context) error {
-			_, err := gothic.GetFromSession("user", c.Request())
-			if err == nil {
-				return c.Redirect(http.StatusFound, "/home")
-			}
-			//if the user is not logged in, continue to the index page
-			return next(c)
-		}
-	})
+	e.GET("/", echo.WrapHandler(templ.Handler(pages.IndexPage())), redirectIfLogged)
 
 	//TODO: Handle error if db is not connected
 	//e.GET("/health", s.healthHandler)
 
 	//Private pages routes
-	pr := e.Group("", AuthorizationMiddleware)
+	pr := e.Group("", AuthorizationMiddleware, s.createUserMiddleware)
 	pr.GET("/home", echo.WrapHandler(templ.Handler(pages.HomePage())))
 
 	// API routes

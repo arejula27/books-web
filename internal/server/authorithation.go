@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+
 	"github.com/labstack/echo/v4"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
@@ -22,7 +23,10 @@ func AuthorizationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(401, map[string]string{"message": "Unauthorized"})
 		}
-		c.Set("user", user)
+		c.Set("user", User{
+			Email: user.Email,
+			Name:  user.Name,
+		})
 		return next(c)
 	}
 
