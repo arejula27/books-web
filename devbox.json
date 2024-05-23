@@ -3,6 +3,8 @@
   "packages": [
     "go@latest",
     "postgresql@latest",
+    "github:a-h/templ",
+    "air@latest",
   ],
   "shell": {
     "scripts": {
@@ -10,26 +12,27 @@
         "echo \"Building...\"",
         "./bin/tailwindcss -i input.css -o web/css/app.css",
         "templ generate",
-        "go build ./cmd/api/main.go"
+        "go build ./cmd/api/main.go",
       ],
       "run": [
-        "go run ./cmd/api/main.go"
+        "go run ./cmd/api/main.go",
       ],
       "test": [
         "echo \"Testing...\"",
-        "go test ./tests -v"
+        "go test ./tests -v",
       ],
       "clean": [
         "echo \"Cleaning...\"",
-        "rm  -f main"],
+        "rm  -f main",
+      ],
       "test": [
         "echo \"Testing...\"",
-        "go test ./tests -v"
+        "go test ./tests -v",
       ],
-      "watch":[
-	    "air",
-	    "echo \"Watching...\"",
-      ]
-    }
-  }
+      "watch": [
+        "air",
+        "echo \"Watching...\"",
+      ],
+    },
+  },
 }
