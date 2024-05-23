@@ -2,6 +2,7 @@
 package database
 
 import (
+	"books/internal/models"
 	"context"
 	"database/sql"
 	"fmt"
@@ -16,7 +17,7 @@ import (
 // Service is an interface for the database service
 type Service interface {
 	Health() map[string]string
-	AddUserIfNotExists(email, name string) error
+	AddUserIfNotExists(email, name string) (models.User, error)
 }
 
 type service struct {
@@ -58,13 +59,16 @@ func (s *service) Health() map[string]string {
 	}
 }
 
-func (s *service) AddUserIfNotExists(email, name string) error {
+func (s *service) AddUserIfNotExists(email, name string) (models.User, error) {
 	//check if user exists
-	_, err := s.getUserByEmail(email)
+	user, err := s.getUserByEmail(email)
 	if nil != err {
 		//if user does not exist insert user
-		return s.insertUser(email, name)
+		user, err = s.insertUser(email, name)
+		if nil != err {
+			return models.User{}, err
+		}
 	}
 	//if user exists return no error
-	return nil
+	return user, nil
 }

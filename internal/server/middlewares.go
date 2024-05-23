@@ -1,16 +1,19 @@
 package server
 
 import (
+	"books/internal/models"
 	"net/http"
+	"strings"
 
 	"encoding/json"
+
 	"github.com/labstack/echo/v4"
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 )
 
 // AuthorizationMiddleware is a middleware to check if the user is authorized
-func AuthorizationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func (s *Server) authorizationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
 		//check the session is valid
@@ -18,29 +21,29 @@ func AuthorizationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(401, map[string]string{"message": "Unauthorized"})
 		}
-		var user goth.User
-		err = json.Unmarshal([]byte(userJSON), &user)
+		var gothUser goth.User
+		err = json.Unmarshal([]byte(userJSON), &gothUser)
 
 		if err != nil {
 			return c.JSON(401, map[string]string{"message": "Unauthorized"})
 		}
-		c.Set("user", User{
-			Email: user.Email,
-			Name:  user.Name,
-		})
-		return next(c)
-	}
-
-}
-func (s *Server) createUserMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		user := c.Get("user").(User)
-		err := s.db.AddUserIfNotExists(user.Email, user.Name)
+		user := models.User{
+			Email: gothUser.Email,
+			Name:  gothUser.Name,
+		}
+		if user.Name == "" {
+			user.Name = strings.Split(user.Email, "@")[0]
+		}
+		user, err = s.db.AddUserIfNotExists(user.Email, user.Name)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
+
+		c.Set("user", user)
+
 		return next(c)
 	}
+
 }
 
 func redirectIfLogged(next echo.HandlerFunc) echo.HandlerFunc {

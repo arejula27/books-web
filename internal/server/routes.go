@@ -4,6 +4,7 @@ package server
 import (
 	"net/http"
 
+	"books/internal/models"
 	"books/web"
 	"books/web/pages"
 
@@ -32,8 +33,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	//e.GET("/health", s.healthHandler)
 
 	//Private pages routes
-	pr := e.Group("", AuthorizationMiddleware, s.createUserMiddleware)
-	pr.GET("/home", echo.WrapHandler(templ.Handler(pages.HomePage())))
+	pr := e.Group("", s.authorizationMiddleware)
+	pr.GET("/home", homePageHandler)
 
 	// API routes
 	e.POST("/hello", echo.WrapHandler(http.HandlerFunc(web.HelloWebHandler)))
@@ -46,13 +47,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 	return e
 }
 
-// HelloWorldHandler is a handler that returns a simple message, used for testing purposes
-func (s *Server) HelloWorldHandler(c echo.Context) error {
-	resp := map[string]string{
-		"message": "Hello World",
-	}
-
-	return c.JSON(http.StatusOK, resp)
+func homePageHandler(c echo.Context) error {
+	user := c.Get("user").(models.User)
+	component := pages.HomePage(user)
+	return component.Render(c.Request().Context(), c.Response())
 }
 
 func (s *Server) healthHandler(c echo.Context) error {

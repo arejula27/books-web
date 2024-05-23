@@ -1,12 +1,13 @@
 package pages
 
 import "books/web/layouts"
+import "books/internal/models"
 
-templ HomePage() {
+templ HomePage(user models.User) {
 	@layouts.Base() {
 		<div>
 			<h1>Home Page</h1>
-			<p>Welcome to the home page</p>
+			<p>Welcome to the home, { user.Name } </p>
 			<button onclick="window.location.href = '/logout/google';">Logout</button>
 		</div>
 	}

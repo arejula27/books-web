@@ -1,4 +1,4 @@
-package server
+package models
 
 // User is a struct that represents a user
 type User struct {
