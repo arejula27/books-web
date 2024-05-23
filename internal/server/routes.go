@@ -33,7 +33,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 
 	//Private pages routes
 	pr := e.Group("", s.authorizationMiddleware)
-	pr.GET("/home", homePageHandler)
+	pr.GET("/home", HomePageHandler)
 
 	// API routes
 	e.POST("/hello", echo.WrapHandler(http.HandlerFunc(web.HelloWebHandler)))
