@@ -5,6 +5,7 @@
     "postgresql@latest",
     "github:a-h/templ",
     "air@latest",
+    "tailwindcss@latest",
   ],
   "shell": {
     "scripts": {
