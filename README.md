@@ -7,9 +7,10 @@ One Paragraph of project description goes here
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-Use [devbox](https://www.jetify.com/devbox) for dependency installation
+Use [devbox](https://www.jetify.com/devbox) for dependency installation. 
 
-## MakeFile
+## Commands
+Use the Makefile inside the `devbox shell`, if not use `devbox run <command>` instead `make <command>`
 
 run all make commands with clean tests
 ```bash
