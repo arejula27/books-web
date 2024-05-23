@@ -25,12 +25,12 @@ const (
 		registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	);
 	`
-	createTableReviews = `
-	CREATE TABLE REVIEWS (
+	createTableTimelineRecords = `
+	CREATE TABLE TIMELINE_RECORDS (
 		id SERIAL PRIMARY KEY,
 		book_id INT NOT NULL, 
 		user_id INT NOT NULL,
-		comment TEXT,
+		received BOOLEAN DEFAULT FALSE,
 		creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		CONSTRAINT fk_book
 			FOREIGN KEY(book_id) 
@@ -44,14 +44,26 @@ const (
 				ON UPDATE CASCADE
 	);
 	`
-	insertUser   = `INSERT INTO users (email, name, image_url) VALUES ($1, $2,$3) RETURNING id`
-	getUser      = "SELECT id, name, email, image_url  FROM users WHERE email = $1"
-	insertBook   = `INSERT INTO books (title, author, editorial) VALUES ($1, $2, $3) RETURNING id`
-	insertReview = `INSERT INTO reviews (book_id, user_id, comment) VALUES ($1, $2, $3) RETURNING id`
+	createTableReviews = `
+		CREATE TABLE REVIEWS (
+		timeline_record_id INT PRIMARY KEY,
+		comment TEXT NOT NULL,
+		CONSTRAINT fk_timeline_record
+			FOREIGN KEY(timeline_record_id)
+			REFERENCES TIMELINE_RECORDS(id)
+			ON DELETE CASCADE
+			ON UPDATE CASCADE
+	);
+	`
 )
 
 func (s *service) clearDatabase() {
+
 	_, err := s.db.Exec("DROP TABLE IF EXISTS reviews")
+	if err != nil {
+		log.Println(err)
+	}
+	_, err = s.db.Exec("DROP TABLE IF EXISTS timeline_records")
 	if err != nil {
 		log.Println(err)
 	}
@@ -79,17 +91,23 @@ func (s *service) createTables() {
 	if err != nil {
 		log.Println("Books table already exists")
 	}
+	_, err = s.db.ExecContext(ctx, createTableTimelineRecords)
+	if err != nil {
+		log.Println("Timeline_records table already exists")
+	}
 	_, err = s.db.ExecContext(ctx, createTableReviews)
 	if err != nil {
 		log.Println("Reviews table already exists")
 	}
+
 }
 
 func (s *service) insertUser(email, name, imageURL string) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
+	query := `INSERT INTO users (email, name, image_url) VALUES ($1, $2,$3) RETURNING id`
 	var userID int
-	err := s.db.QueryRowContext(ctx, insertUser, email, name, imageURL).Scan(&userID)
+	err := s.db.QueryRowContext(ctx, query, email, name, imageURL).Scan(&userID)
 	if err != nil {
 		return 0, err
 	}
@@ -100,8 +118,9 @@ func (s *service) insertUser(email, name, imageURL string) (int, error) {
 func (s *service) getUserByEmail(email string) (models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
+	query := "SELECT id, name, email, image_url  FROM users WHERE email = $1"
 	var user models.User
-	err := s.db.QueryRowContext(ctx, getUser, email).Scan(&user.ID, &user.Name, &user.Email, &user.ImageURL)
+	err := s.db.QueryRowContext(ctx, query, email).Scan(&user.ID, &user.Name, &user.Email, &user.ImageURL)
 
 	return user, err
 }
@@ -114,13 +133,22 @@ func (s *service) insertBook(book models.Book, userID int, review string) (int, 
 	if err != nil {
 		return 0, err
 	}
+	insertBook := `INSERT INTO books (title, author, editorial) VALUES ($1, $2, $3) RETURNING id`
 	err = tx.QueryRowContext(ctx, insertBook, book.Title, book.Author, book.Editorial).Scan(&bookID)
 
 	if err != nil {
 		tx.Rollback()
 		return 0, err
 	}
-	_, err = tx.ExecContext(ctx, insertReview, bookID, userID, review)
+	var recordID int
+	insertTimelineRecord := `INSERT INTO timeline_records (book_id, user_id,received) VALUES ($1, $2, $3 ) RETURNING id`
+	err = tx.QueryRowContext(ctx, insertTimelineRecord, bookID, userID, true).Scan(&recordID)
+	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+	insertReview := `INSERT INTO reviews (timeline_record_id, comment) VALUES ($1, $2) RETURNING timeline_record_id`
+	_, err = tx.ExecContext(ctx, insertReview, recordID, review)
 	if err != nil {
 		tx.Rollback()
 		return 0, err
@@ -133,11 +161,12 @@ func (s *service) insertBook(book models.Book, userID int, review string) (int, 
 
 	return bookID, nil
 }
-func (s *service) insertReview(review string, userID int, bookID int) (int, error) {
+func (s *service) insertTimelineRecord(userID int, bookID int) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	var reviewID int
-	err := s.db.QueryRowContext(ctx, insertReview, bookID, userID, review).Scan(&reviewID)
+	query := `INSERT INTO timeline_records (book_id, user_id) VALUES ($1, $2 ) RETURNING id`
+	err := s.db.QueryRowContext(ctx, query, bookID, userID).Scan(&reviewID)
 	if err != nil {
 		return 0, err
 	}
