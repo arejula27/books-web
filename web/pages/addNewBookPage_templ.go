@@ -11,9 +11,8 @@ import "io"
 import "bytes"
 
 import "books/web/layouts"
-import "books/internal/models"
 
-func HomePage(user models.User) templ.Component {
+func AddBookPage() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -32,20 +31,7 @@ func HomePage(user models.User) templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex-col\"><h1>Home Page</h1><p>Welcome to the home, ")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var3 string
-			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(user.Name)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/homePage.templ`, Line: 10, Col: 36}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p><div><button onclick=\"window.location.href = &#39;/logout/google&#39;;\">Cerrar sesión</button></div><div><button onclick=\"window.location.href = &#39;/addBook&#39;;\">Añadir un nuevo libro</button></div></div>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1>Add Book</h1><form action=\"/addBook\" method=\"post\"><div><label for=\"title\">Título</label> <input type=\"text\" id=\"title\" name=\"title\" required></div><div><label for=\"author\">Autor</label> <input type=\"text\" id=\"author\" name=\"author\" required></div><div><label for=\"editorial\">Editorial</label> <input type=\"text\" id=\"editorial\" name=\"editorial\" required></div><div><label for=\"image\">Foto del libro</label> <input type=\"file\" id=\"image\" name=\"image\" required></div><button type=\"submit\">Subir</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

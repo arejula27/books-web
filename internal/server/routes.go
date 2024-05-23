@@ -34,9 +34,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 	//Private pages routes
 	pr := e.Group("", s.authorizationMiddleware)
 	pr.GET("/home", HomePageHandler)
+	pr.GET("/addBook", echo.WrapHandler(templ.Handler(pages.AddBookPage())))
 
 	// API routes
-	e.POST("/hello", echo.WrapHandler(http.HandlerFunc(web.HelloWebHandler)))
+	e.POST("/addBook", s.addBookHandler)
 
 	// Auth routes
 	e.GET("/auth/:provider/callback", googleCallback)

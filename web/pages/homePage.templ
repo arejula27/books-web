@@ -4,11 +4,16 @@ import "books/web/layouts"
 import "books/internal/models"
 
 templ HomePage(user models.User) {
-	@layouts.Base() {
-		<div>
-			<h1>Home Page</h1>
-			<p>Welcome to the home, { user.Name } </p>
-			<button onclick="window.location.href = '/logout/google';">Logout</button>
-		</div>
-	}
+@layouts.Base() {
+<div class="flex-col">
+	<h1>Home Page</h1>
+	<p>Welcome to the home, { user.Name } </p>
+	<div>
+		<button onclick="window.location.href = '/logout/google';">Cerrar sesión</button>
+	</div>
+	<div>
+		<button onclick="window.location.href = '/addBook';">Añadir un nuevo libro</button>
+	</div>
+</div>
+}
 }
