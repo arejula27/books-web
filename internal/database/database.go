@@ -17,7 +17,7 @@ import (
 // Service is an interface for the database service
 type Service interface {
 	Health() map[string]string
-	AddUserIfNotExists(email, name string) (models.User, error)
+	AddUserIfNotExists(email, name, imageURL string) (models.User, error)
 }
 
 type service struct {
@@ -59,12 +59,12 @@ func (s *service) Health() map[string]string {
 	}
 }
 
-func (s *service) AddUserIfNotExists(email, name string) (models.User, error) {
+func (s *service) AddUserIfNotExists(email, name, imageURL string) (models.User, error) {
 	//check if user exists
 	user, err := s.getUserByEmail(email)
 	if nil != err {
 		//if user does not exist insert user
-		user, err = s.insertUser(email, name)
+		user, err = s.insertUser(email, name, imageURL)
 		if nil != err {
 			return models.User{}, err
 		}

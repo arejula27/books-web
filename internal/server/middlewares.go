@@ -28,13 +28,14 @@ func (s *Server) authorizationMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 			return c.JSON(401, map[string]string{"message": "Unauthorized"})
 		}
 		user := models.User{
-			Email: gothUser.Email,
-			Name:  gothUser.Name,
+			Email:    gothUser.Email,
+			Name:     gothUser.Name,
+			ImageURL: gothUser.AvatarURL,
 		}
 		if user.Name == "" {
 			user.Name = strings.Split(user.Email, "@")[0]
 		}
-		user, err = s.db.AddUserIfNotExists(user.Email, user.Name)
+		user, err = s.db.AddUserIfNotExists(user.Email, user.Name, user.ImageURL)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
