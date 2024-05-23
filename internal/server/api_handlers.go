@@ -17,8 +17,10 @@ func (s *Server) addBookHandler(c echo.Context) error {
 	book.Title = c.FormValue("title")
 	book.Author = c.FormValue("author")
 	book.Editorial = c.FormValue("editorial")
+	userID := c.Get("user").(models.User).ID
+	review := c.FormValue("review")
 
-	book, err := s.db.AddBook(book)
+	_, err := s.db.AddBook(book, userID, review)
 	if err != nil {
 		return err
 	}

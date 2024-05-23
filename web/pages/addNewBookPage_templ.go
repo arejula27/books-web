@@ -31,7 +31,7 @@ func AddBookPage() templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1>Add Book</h1><form action=\"/addBook\" method=\"post\"><div><label for=\"title\">Título</label> <input type=\"text\" id=\"title\" name=\"title\" required></div><div><label for=\"author\">Autor</label> <input type=\"text\" id=\"author\" name=\"author\" required></div><div><label for=\"editorial\">Editorial</label> <input type=\"text\" id=\"editorial\" name=\"editorial\" required></div><div><label for=\"image\">Foto del libro</label> <input type=\"file\" id=\"image\" name=\"image\" required></div><button type=\"submit\">Subir</button></form>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1>Add Book</h1><form action=\"/addBook\" method=\"post\"><div><label for=\"title\">Título</label> <input type=\"text\" id=\"title\" name=\"title\" required></div><div><label for=\"author\">Autor</label> <input type=\"text\" id=\"author\" name=\"author\" required></div><div><label for=\"editorial\">Editorial</label> <input type=\"text\" id=\"editorial\" name=\"editorial\" required></div><div><label for=\"image\">Foto del libro</label> <input type=\"file\" id=\"image\" name=\"image\"></div><div><label for=\"review\">Reseña</label> <textarea id=\"review\" name=\"review\" required></textarea></div><button type=\"submit\">Subir</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

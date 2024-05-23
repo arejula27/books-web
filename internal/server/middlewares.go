@@ -21,9 +21,9 @@ func (s *Server) authorizationMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 		if err != nil {
 			return c.JSON(401, map[string]string{"message": "Unauthorized"})
 		}
+		//parse the user from the session
 		var gothUser goth.User
 		err = json.Unmarshal([]byte(userJSON), &gothUser)
-
 		if err != nil {
 			return c.JSON(401, map[string]string{"message": "Unauthorized"})
 		}
@@ -35,11 +35,12 @@ func (s *Server) authorizationMiddleware(next echo.HandlerFunc) echo.HandlerFunc
 		if user.Name == "" {
 			user.Name = strings.Split(user.Email, "@")[0]
 		}
-		user, err = s.db.AddUserIfNotExists(user.Email, user.Name, user.ImageURL)
+		//if is new user, add it to the database
+		user.ID, err = s.db.AddUserIfNotExists(user.Email, user.Name, user.ImageURL)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		}
-
+		//set the user in the context
 		c.Set("user", user)
 
 		return next(c)

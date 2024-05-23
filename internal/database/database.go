@@ -17,8 +17,8 @@ import (
 // Service is an interface for the database service
 type Service interface {
 	Health() map[string]string
-	AddUserIfNotExists(email, name, imageURL string) (models.User, error)
-	AddBook(book models.Book) (models.Book, error)
+	AddUserIfNotExists(email, name, imageURL string) (int, error)
+	AddBook(book models.Book, userID int, review string) (int, error)
 }
 
 type service struct {
@@ -66,26 +66,32 @@ func (s *service) Health() map[string]string {
 	}
 }
 
-func (s *service) AddUserIfNotExists(email, name, imageURL string) (models.User, error) {
+// TODO: change parameter to models.User
+func (s *service) AddUserIfNotExists(email, name, imageURL string) (int, error) {
 	//check if user exists
 	user, err := s.getUserByEmail(email)
-	if sql.ErrNoRows == err {
+
+	if nil == err {
+		//if user exists return no error
+		return user.ID, nil
+	} else if sql.ErrNoRows == err {
 		//if user does not exist insert user
-		user, err = s.insertUser(email, name, imageURL)
+		userID, err := s.insertUser(email, name, imageURL)
 		if nil != err {
-			return models.User{}, err
+			return 0, err
 		}
+		return userID, nil
 	}
-	//if user exists return no error
-	return user, nil
+	//return error
+	return 0, err
 }
-func (s *service) AddBook(book models.Book) (models.Book, error) {
+func (s *service) AddBook(book models.Book, userID int, review string) (int, error) {
 	//insert book
-	book, err := s.insertBook(book)
+	bookID, err := s.insertBook(book, userID, review)
 	if nil != err {
-		return models.Book{}, err
+		return 0, err
 	}
 	//return book
-	return book, nil
+	return bookID, nil
 
 }

@@ -37,7 +37,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	pr.GET("/addBook", echo.WrapHandler(templ.Handler(pages.AddBookPage())))
 
 	// API routes
-	e.POST("/addBook", s.addBookHandler)
+	pr.POST("/addBook", s.addBookHandler)
 
 	// Auth routes
 	e.GET("/auth/:provider/callback", googleCallback)

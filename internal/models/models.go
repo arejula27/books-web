@@ -14,3 +14,10 @@ type Book struct {
 	Author    string
 	Editorial string
 }
+
+type Review struct {
+	ID     int
+	Review string
+	User   int
+	Book   int
+}

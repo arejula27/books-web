@@ -44,22 +44,23 @@ const (
 				ON UPDATE CASCADE
 	);
 	`
-	insertUser = `INSERT INTO users (email, name, image_url) VALUES ($1, $2,$3) RETURNING id, email, name, image_url`
-	getUser    = "SELECT id, name, email, image_url  FROM users WHERE email = $1"
-	insertBook = `INSERT INTO books (title, author, editorial) VALUES ($1, $2, $3) RETURNING id`
+	insertUser   = `INSERT INTO users (email, name, image_url) VALUES ($1, $2,$3) RETURNING id`
+	getUser      = "SELECT id, name, email, image_url  FROM users WHERE email = $1"
+	insertBook   = `INSERT INTO books (title, author, editorial) VALUES ($1, $2, $3) RETURNING id`
+	insertReview = `INSERT INTO reviews (book_id, user_id, comment) VALUES ($1, $2, $3) RETURNING id`
 )
 
 func (s *service) clearDatabase() {
-	_, err := s.db.Exec("DROP TABLE IF EXISTS users")
+	_, err := s.db.Exec("DROP TABLE IF EXISTS reviews")
+	if err != nil {
+		log.Println(err)
+	}
+	_, err = s.db.Exec("DROP TABLE IF EXISTS users")
 	if err != nil {
 		log.Println(err)
 	}
 	_, err = s.db.Exec("DROP TABLE IF EXISTS books")
 
-	if err != nil {
-		log.Println(err)
-	}
-	_, err = s.db.Exec("DROP TABLE IF EXISTS reviews")
 	if err != nil {
 		log.Println(err)
 	}
@@ -80,21 +81,20 @@ func (s *service) createTables() {
 	}
 	_, err = s.db.ExecContext(ctx, createTableReviews)
 	if err != nil {
-		log.Fatal(err)
 		log.Println("Reviews table already exists")
 	}
 }
 
-func (s *service) insertUser(email, name, imageURL string) (models.User, error) {
+func (s *service) insertUser(email, name, imageURL string) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	var user models.User
-	err := s.db.QueryRowContext(ctx, insertUser, email, name, imageURL).Scan(&user.ID, &user.Email, &user.Name, &user.ImageURL)
+	var userID int
+	err := s.db.QueryRowContext(ctx, insertUser, email, name, imageURL).Scan(&userID)
 	if err != nil {
-		return models.User{}, err
+		return 0, err
 	}
 
-	return user, nil
+	return userID, nil
 }
 
 func (s *service) getUserByEmail(email string) (models.User, error) {
@@ -106,13 +106,40 @@ func (s *service) getUserByEmail(email string) (models.User, error) {
 	return user, err
 }
 
-func (s *service) insertBook(book models.Book) (models.Book, error) {
+func (s *service) insertBook(book models.Book, userID int, review string) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	err := s.db.QueryRowContext(ctx, insertBook, book.Title, book.Author, book.Editorial).Scan(&book.ID)
+	var bookID int
+	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
-		return models.Book{}, err
+		return 0, err
+	}
+	err = tx.QueryRowContext(ctx, insertBook, book.Title, book.Author, book.Editorial).Scan(&bookID)
+
+	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+	_, err = tx.ExecContext(ctx, insertReview, bookID, userID, review)
+	if err != nil {
+		tx.Rollback()
+		return 0, err
 	}
 
-	return book, nil
+	err = tx.Commit()
+	if err != nil {
+		return 0, err
+	}
+
+	return bookID, nil
+}
+func (s *service) insertReview(review string, userID int, bookID int) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	var reviewID int
+	err := s.db.QueryRowContext(ctx, insertReview, bookID, userID, review).Scan(&reviewID)
+	if err != nil {
+		return 0, err
+	}
+	return reviewID, nil
 }
