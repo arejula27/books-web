@@ -4,7 +4,6 @@ package server
 import (
 	"net/http"
 
-	"books/internal/models"
 	"books/web"
 	"books/web/pages"
 
@@ -45,14 +44,4 @@ func (s *Server) RegisterRoutes() http.Handler {
 	e.GET("/auth/:provider", login)
 
 	return e
-}
-
-func homePageHandler(c echo.Context) error {
-	user := c.Get("user").(models.User)
-	component := pages.HomePage(user)
-	return component.Render(c.Request().Context(), c.Response())
-}
-
-func (s *Server) healthHandler(c echo.Context) error {
-	return c.JSON(http.StatusOK, s.db.Health())
 }
