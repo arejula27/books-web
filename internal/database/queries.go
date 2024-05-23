@@ -172,3 +172,25 @@ func (s *service) insertTimelineRecord(userID int, bookID int) (int, error) {
 	}
 	return reviewID, nil
 }
+func (s *service) selectBooksFromUser(userID int) ([]models.Book, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	query := `SELECT b.id, b.title, b.author, b.editorial FROM books 
+		b INNER JOIN timeline_records tr ON b.id = tr.book_id WHERE tr.user_id = $1
+		ORDER BY tr.creation_date DESC`
+	rows, err := s.db.QueryContext(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var books []models.Book
+	for rows.Next() {
+		var book models.Book
+		err = rows.Scan(&book.ID, &book.Title, &book.Author, &book.Editorial)
+		if err != nil {
+			return nil, err
+		}
+		books = append(books, book)
+	}
+	return books, nil
+}

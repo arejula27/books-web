@@ -19,6 +19,7 @@ type Service interface {
 	Health() map[string]string
 	AddUserIfNotExists(email, name, imageURL string) (int, error)
 	AddBook(book models.Book, userID int, review string) (int, error)
+	GetBooksFromUser(userID int) ([]models.Book, error)
 }
 
 type service struct {
@@ -94,4 +95,13 @@ func (s *service) AddBook(book models.Book, userID int, review string) (int, err
 	//return book
 	return bookID, nil
 
+}
+func (s *service) GetBooksFromUser(userID int) ([]models.Book, error) {
+	//get books from user
+	books, err := s.selectBooksFromUser(userID)
+	if nil != err {
+		return nil, err
+	}
+
+	return books, nil
 }

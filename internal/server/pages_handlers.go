@@ -7,8 +7,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func HomePageHandler(c echo.Context) error {
+func (s *Server) HomePageHandler(c echo.Context) error {
 	user := c.Get("user").(models.User)
-	component := pages.HomePage(user)
+	books, err := s.db.GetBooksFromUser(user.ID)
+	if err != nil {
+		return err
+	}
+	component := pages.HomePage(user, books)
 	return component.Render(c.Request().Context(), c.Response())
 }

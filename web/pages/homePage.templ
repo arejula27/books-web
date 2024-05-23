@@ -1,19 +1,29 @@
 package pages
 
 import "books/web/layouts"
+import "strconv"
 import "books/internal/models"
 
-templ HomePage(user models.User) {
-@layouts.Base() {
-<div class="flex-col">
-	<h1>Home Page</h1>
-	<p>Welcome to the home, { user.Name } </p>
-	<div>
-		<button onclick="window.location.href = '/logout/google';">Cerrar sesión</button>
-	</div>
-	<div>
-		<button onclick="window.location.href = '/addBook';">Añadir un nuevo libro</button>
-	</div>
-</div>
+templ HomePage(user models.User, books []models.Book) {
+	@layouts.Base() {
+		<div class="flex-col">
+			<h1>Home Page</h1>
+			<p>Welcome to the home, { user.Name } </p>
+			<div>
+				<a href="/logout/google">Cerrar sesión</a>
+			</div>
+			<div>
+				<a href="/addBook">Añadir un nuevo libro</a>
+			</div>
+			<div>
+				for _, book := range books {
+					<a href={ templ.SafeURL(bookURL(book)) }>{ book.Title }</a>
+				}
+			</div>
+		</div>
+	}
 }
+
+func bookURL(book models.Book) string {
+	return "/book/" + strconv.Itoa(book.ID)
 }
