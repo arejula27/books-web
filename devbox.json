@@ -26,13 +26,9 @@
         "echo \"Cleaning...\"",
         "rm  -f main",
       ],
-      "test": [
-        "echo \"Testing...\"",
-        "go test ./tests -v",
-      ],
       "watch": [
-        "air",
         "echo \"Watching...\"",
+        "air",
       ],
     },
   },
