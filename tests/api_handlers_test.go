@@ -49,6 +49,7 @@ func TestAddBookHandler(t *testing.T) {
 		return
 	}
 
+	// Setup server
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/addBook", nil)
 	resp := httptest.NewRecorder()

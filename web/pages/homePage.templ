@@ -15,7 +15,7 @@ templ HomePage(user models.User, books []models.Book) {
 			<div>
 				<a href="/addBook">Añadir un nuevo libro</a>
 			</div>
-			<div>
+			<div data-testid="BooksList">
 				for _, book := range books {
 					<a href={ templ.SafeURL(bookURL(book)) }>{ book.Title }</a>
 					<hr/>
