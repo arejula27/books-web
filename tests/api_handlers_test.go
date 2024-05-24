@@ -1,8 +1,6 @@
 package tests
 
 import (
-	"books/internal/database"
-	"books/internal/models"
 	"books/internal/server"
 	"net/http"
 	"net/http/httptest"
@@ -30,34 +28,29 @@ func TestHealthHandler(t *testing.T) {
 }
 
 func TestAddBookHandler(t *testing.T) {
+	////////////////////////////////////////
 	// Setup database
+	////////////////////////////////////////
 
-	db := database.New(database.TestConfig(), database.ResetDatabase())
-	err := db.Connect()
+	db, err := setupDB()
 	if err != nil {
-		t.Errorf("handler() error = %v", err)
-		return
-	}
-	testUser := models.User{
-		Name:  "test_name",
-		Email: "test_mail@mail.test",
-	}
-	testUser.ID, err = db.AddUserIfNotExists(testUser.Name, testUser.Email, "test_image")
-
-	if err != nil {
-		t.Error("Error adding test user")
+		t.Errorf("Error setting up database: %v", err)
 		return
 	}
 
+	////////////////////////////////////////
 	// Setup server
+	////////////////////////////////////////
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/addBook", nil)
 	resp := httptest.NewRecorder()
 	c := e.NewContext(req, resp)
-	c.Set("user", testUser)
+	c.Set("user", users[0])
 	router := server.NewRouter(server.WithTestDB())
 
+	////////////////////////////////////////
 	// Assertions
+	////////////////////////////////////////
 	if err := router.AddBookHandler(c); err != nil {
 		t.Errorf("handler() error = %v", err)
 		return
@@ -68,7 +61,7 @@ func TestAddBookHandler(t *testing.T) {
 	}
 
 	//check if the book was added
-	books, err := db.GetBookByID(1)
+	books, err := (*db).GetBookByID(1)
 	if err != nil {
 		t.Errorf("handler() error = %v", err)
 		return

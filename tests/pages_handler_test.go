@@ -1,8 +1,6 @@
 package tests
 
 import (
-	"books/internal/database"
-	"books/internal/models"
 	"books/internal/server"
 	"net/http"
 	"net/http/httptest"
@@ -16,59 +14,10 @@ func TestHomePage(t *testing.T) {
 	////////////////////////////////////////
 	/////Setup database
 	////////////////////////////////////////
-	db := database.New(database.TestConfig(), database.ResetDatabase())
-	err := db.Connect()
+	_, err := setupDB()
 	if err != nil {
-		t.Errorf("handler() error = %v", err)
+		t.Errorf("Error setting up database: %v", err)
 		return
-	}
-	//add two test users
-	testUser1 := models.User{
-		Name:  "test_name",
-		Email: "test_mail@mail.test",
-	}
-	testUser1.ID, err = db.AddUserIfNotExists(testUser1.Name, testUser1.Email, "test_image")
-	testUser2 := models.User{
-		Name:  "test_name2",
-		Email: "test_mail2@mail.test",
-	}
-	testUser2.ID, err = db.AddUserIfNotExists(testUser2.Name, testUser2.Email, "test_image2")
-
-	if err != nil {
-		t.Error("Error adding test user 2")
-		return
-	}
-
-	//add books
-	books := []models.Book{
-		{
-			Title:     "test_title",
-			Author:    "test_autor",
-			Editorial: "test_editorial",
-		},
-		{
-			Title:     "test_title2",
-			Author:    "test_autor2",
-			Editorial: "test_editorial2",
-		},
-		{
-			Title:     "test_title3",
-			Author:    "test_autor3",
-			Editorial: "test_editorial3",
-		},
-	}
-
-	for i, book := range books {
-		if i%2 == 0 {
-			book.ID, err = db.AddBook(book, testUser2.ID, "")
-
-		} else {
-			book.ID, err = db.AddBook(book, testUser1.ID, "")
-		}
-		if err != nil {
-			t.Error("Error adding test book")
-			return
-		}
 	}
 	////////////////////////////////////////
 	// Setup server
@@ -77,7 +26,7 @@ func TestHomePage(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	resp := httptest.NewRecorder()
 	c := e.NewContext(req, resp)
-	c.Set("user", testUser2)
+	c.Set("user", users[0])
 	server := server.NewRouter(server.WithTestDB())
 
 	////////////////////////////////////////
