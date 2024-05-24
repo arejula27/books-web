@@ -70,12 +70,7 @@ func NewRouter(opts ...optFunc) *Router {
 // New creates a new server instance
 func New() *http.Server {
 
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
-	NewServer := &Router{
-		port: port,
-
-		db: database.New(),
-	}
+	NewServer := NewRouter()
 
 	googleClientID := os.Getenv("GOOGLE_CLIENT_ID")
 	googleClientSecret := os.Getenv("GOOGLE_CLIENT_SECRET")

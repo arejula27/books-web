@@ -2,16 +2,23 @@ name: Go-test
 on: [push, pull_request]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
+    env:
+      DB_HOST: localhost 
+      DB_USERNAME: runner
+      DB_PASSWORD: postgres
+      DB_DATABASE: books_test
+      DB_PORT: 5432
+    
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.21.x'
-      - name: Build
-        run: go build -v ./...
-      - name: Test with the Go CLI
-        run: go test ./... 
+      - name: Install devbox
+        uses: jetify-com/devbox-install-action@v0.10.0
+      - name: Launch devbox services
+        run: devbox services start 
+      - name: Create database
+        run : devbox run initdb --no-locale && sleep 5 && devbox run createdb $DB_DATABASE
+      - name: Run tests
+        run: devbox run test
+        

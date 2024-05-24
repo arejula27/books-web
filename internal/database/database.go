@@ -64,9 +64,14 @@ func TestConfig() OptFunc {
 		//print the current directory
 		err := godotenv.Load("../.env.test")
 		if err != nil {
-			log.Fatalf("Error loading .env file")
+			log.Println("Error loading .env file")
+
 		}
+
 		o.database = "books_test"
+		if os.Getenv("DB_DATABASE") != "" {
+			o.database = os.Getenv("DB_DATABASE")
+		}
 		o.appEnv = "test"
 		o.username = os.Getenv("DB_USERNAME")
 		o.password = os.Getenv("DB_PASSWORD")

@@ -1,4 +1,4 @@
-[![Built with Devbox](https://www.jetify.com/img/devbox/shield_galaxy.svg)](https://www.jetify.com/devbox/docs/contributor-quickstart/)
+[![Built with Devbox](https://www.jetify.com/img/devbox/shield_galaxy.svg)](https://www.jetify.com/devbox/docs/contributor-quickstart/) [![Go-test](https://github.com/arejula27/books-web/actions/workflows/go-test.yml/badge.svg)](https://github.com/arejula27/books-web/actions/workflows/go-test.yml)
 # Project books
 
 One Paragraph of project description goes here
