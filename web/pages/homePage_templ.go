@@ -11,8 +11,8 @@ import "io"
 import "bytes"
 
 import "books/web/layouts"
-import "strconv"
 import "books/internal/models"
+import "strconv"
 
 func HomePage(user models.User, books []models.Book) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
@@ -55,7 +55,7 @@ func HomePage(user models.User, books []models.Book) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var4 templ.SafeURL = templ.SafeURL(bookURL(book))
+				var templ_7745c5c3_Var4 templ.SafeURL = templ.SafeURL("/book/" + strconv.Itoa(book.ID))
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(string(templ_7745c5c3_Var4)))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -67,7 +67,7 @@ func HomePage(user models.User, books []models.Book) templ.Component {
 				var templ_7745c5c3_Var5 string
 				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(book.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/homePage.templ`, Line: 20, Col: 58}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/homePage.templ`, Line: 20, Col: 77}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 				if templ_7745c5c3_Err != nil {
@@ -96,8 +96,4 @@ func HomePage(user models.User, books []models.Book) templ.Component {
 		}
 		return templ_7745c5c3_Err
 	})
-}
-
-func bookURL(book models.Book) string {
-	return "/book/" + strconv.Itoa(book.ID)
 }

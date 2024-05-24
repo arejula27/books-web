@@ -1,8 +1,8 @@
 package pages
 
 import "books/web/layouts"
-import "strconv"
 import "books/internal/models"
+import "strconv"
 
 templ HomePage(user models.User, books []models.Book) {
 	@layouts.Base() {
@@ -17,14 +17,10 @@ templ HomePage(user models.User, books []models.Book) {
 			</div>
 			<div data-testid="BooksList">
 				for _, book := range books {
-					<a href={ templ.SafeURL(bookURL(book)) }>{ book.Title }</a>
+					<a href={ templ.SafeURL("/book/" + strconv.Itoa(book.ID)) }>{ book.Title }</a>
 					<hr/>
 				}
 			</div>
 		</div>
 	}
-}
-
-func bookURL(book models.Book) string {
-	return "/book/" + strconv.Itoa(book.ID)
 }
