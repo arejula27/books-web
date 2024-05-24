@@ -13,7 +13,7 @@ import (
 )
 
 // RegisterRoutes registers the routes for the server
-func (s *Server) RegisterRoutes() http.Handler {
+func (s *Router) RegisterRoutes() http.Handler {
 	e := echo.New()
 
 	// Middlewares
@@ -38,7 +38,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	pr.GET("/addBook", echo.WrapHandler(templ.Handler(pages.AddBookPage())))
 
 	// API routes
-	pr.POST("/addBook", s.addBookHandler)
+	pr.POST("/addBook", s.AddBookHandler)
 
 	// Auth routes
 	e.GET("/auth/:provider/callback", googleCallback)

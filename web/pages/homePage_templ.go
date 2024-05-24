@@ -33,14 +33,14 @@ func HomePage(user models.User, books []models.Book) templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex-col\"><h1 class=\"text-8xl font-bold\">Home Page</h1><p class=\"text-gray-300 text-3xl\">Welcome home, ")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex-col\"><h1 class=\"text-8xl font-bold\">Home Page</h1><p class=\"text-gray-300 text-3xl \">Welcome home, ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(user.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/homePage.templ`, Line: 11, Col: 62}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/homePage.templ`, Line: 11, Col: 63}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {

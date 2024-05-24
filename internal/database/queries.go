@@ -84,20 +84,20 @@ func (s *service) createTables() {
 	// create users table
 	_, err := s.db.ExecContext(ctx, createTableUsers)
 	if err != nil {
-		log.Println("User table already exists")
+		s.logMsg("User table already exists")
 	}
 	// create books table
 	_, err = s.db.ExecContext(ctx, createTableBooks)
 	if err != nil {
-		log.Println("Books table already exists")
+		s.logMsg("Books table already exists")
 	}
 	_, err = s.db.ExecContext(ctx, createTableTimelineRecords)
 	if err != nil {
-		log.Println("Timeline_records table already exists")
+		s.logMsg("Timeline records table already exists")
 	}
 	_, err = s.db.ExecContext(ctx, createTableReviews)
 	if err != nil {
-		log.Println("Reviews table already exists")
+		s.logMsg("Reviews table already exists")
 	}
 
 }
@@ -193,4 +193,15 @@ func (s *service) selectBooksFromUser(userID int) ([]models.Book, error) {
 		books = append(books, book)
 	}
 	return books, nil
+}
+func (s *service) selectBookByID(bookID int) (models.Book, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	query := `SELECT id, title, author, editorial FROM books WHERE id = $1`
+	var book models.Book
+	err := s.db.QueryRowContext(ctx, query, bookID).Scan(&book.ID, &book.Title, &book.Author, &book.Editorial)
+	if err != nil {
+		return models.Book{}, err
+	}
+	return book, nil
 }

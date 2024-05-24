@@ -13,7 +13,7 @@ import (
 )
 
 // AuthorizationMiddleware is a middleware to check if the user is authorized
-func (s *Server) authorizationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+func (s *Router) authorizationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
 		//check the session is valid

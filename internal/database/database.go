@@ -11,45 +11,112 @@ import (
 	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib" // initialize pgx driver
-	_ "github.com/joho/godotenv/autoload"
+	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload" // load .env file
 )
 
 // Service is an interface for the database service
 type Service interface {
+	Connect() error
 	Health() map[string]string
 	AddUserIfNotExists(email, name, imageURL string) (int, error)
 	AddBook(book models.Book, userID int, review string) (int, error)
 	GetBooksFromUser(userID int) ([]models.Book, error)
+	GetBookByID(bookID int) (models.Book, error)
 }
 
 type service struct {
-	db *sql.DB
+	db      *sql.DB
+	connStr string
+	reset   string
+	appEnv  string
+	verbose bool
 }
 
-var (
-	database = os.Getenv("DB_DATABASE")
-	password = os.Getenv("DB_PASSWORD")
-	username = os.Getenv("DB_USERNAME")
-	port     = os.Getenv("DB_PORT")
-	host     = os.Getenv("DB_HOST")
-	reset    = os.Getenv("DB_RESET")
-	appEnv   = os.Getenv("APP_ENV")
-)
+var ()
+
+type OptFunc func(*opts)
+
+type opts struct {
+	database string
+	password string
+	username string
+	port     string
+	host     string
+	reset    string
+	appEnv   string
+	verbose  bool
+}
+
+func defaultOpts() *opts {
+
+	return &opts{
+		database: os.Getenv("DB_DATABASE"),
+		password: os.Getenv("DB_PASSWORD"),
+		username: os.Getenv("DB_USERNAME"),
+		port:     os.Getenv("DB_PORT"),
+		host:     os.Getenv("DB_HOST"),
+		reset:    os.Getenv("DB_RESET"),
+		appEnv:   os.Getenv("APP_ENV")}
+}
+func TestConfig() OptFunc {
+	return func(o *opts) {
+		//print the current directory
+		err := godotenv.Load("../.env.test")
+		if err != nil {
+			log.Fatalf("Error loading .env file")
+		}
+		o.database = "books_test"
+		o.appEnv = "test"
+		o.username = os.Getenv("DB_USERNAME")
+		o.password = os.Getenv("DB_PASSWORD")
+		o.host = os.Getenv("DB_HOST")
+		o.port = os.Getenv("DB_PORT")
+		o.verbose = os.Getenv("VERBOSE") == "true"
+
+	}
+}
+func ResetDatabase() OptFunc {
+	return func(o *opts) {
+		o.reset = "true"
+	}
+}
 
 // New creates a new database service
-func New() Service {
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", username, password, host, port, database)
-	db, err := sql.Open("pgx", connStr)
-	if err != nil {
-		log.Fatal(err)
+func New(opts ...OptFunc) Service {
+	opt := defaultOpts()
+	for _, fn := range opts {
+		fn(opt)
 	}
-	s := &service{db: db}
-	if reset == "true" && appEnv != "production" {
-		log.Println("resetting database")
+	s := &service{
+		connStr: fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", opt.username, opt.password, opt.host, opt.port, opt.database),
+		reset:   opt.reset,
+		appEnv:  opt.appEnv,
+		verbose: opt.verbose,
+	}
+
+	return s
+}
+
+func (s *service) logMsg(msg string) {
+	if s.verbose {
+		log.Println(msg)
+	}
+}
+
+func (s *service) Connect() error {
+	db, err := sql.Open("pgx", s.connStr)
+	if err != nil {
+		return err
+	}
+	s.db = db
+
+	if s.reset == "true" && s.appEnv != "production" {
+		s.logMsg("resetting database")
 		s.clearDatabase()
 	}
 	s.createTables()
-	return s
+	return nil
 }
 
 // Health checks the health of the database, returns a map with a message or stops the application if the database is down
@@ -104,4 +171,12 @@ func (s *service) GetBooksFromUser(userID int) ([]models.Book, error) {
 	}
 
 	return books, nil
+}
+
+func (s *service) GetBookByID(bookID int) (models.Book, error) {
+	book, err := s.selectBookByID(bookID)
+	if nil != err {
+		return models.Book{}, err
+	}
+	return book, nil
 }

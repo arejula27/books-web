@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (s *Server) HomePageHandler(c echo.Context) error {
+func (s *Router) HomePageHandler(c echo.Context) error {
 	user := c.Get("user").(models.User)
 	books, err := s.db.GetBooksFromUser(user.ID)
 	if err != nil {

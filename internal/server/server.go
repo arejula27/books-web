@@ -3,15 +3,17 @@ package server
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"strconv"
+	"time"
+
 	"github.com/gorilla/sessions"
 	_ "github.com/joho/godotenv/autoload" // load .env file
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/google"
-	"net/http"
-	"os"
-	"strconv"
-	"time"
 
 	"books/internal/database"
 )
@@ -22,18 +24,54 @@ const (
 	IsProd = false      // IsProd this to true when deploying to production
 )
 
-// Server is a struct that holds the server configuration
-type Server struct {
+// Router is a struct that holds the server configuration
+type Router struct {
 	port int
-
-	db database.Service
+	db   database.Service
+}
+type optFunc func(*opts)
+type opts struct {
+	db   database.Service
+	port int
 }
 
-// NewServer creates a new server instance
-func NewServer() *http.Server {
+func defaultOpts() *opts {
+	port, err := strconv.Atoi(os.Getenv("PORT"))
+	if err != nil {
+		port = 3000
+	}
+	return &opts{
+		port: port,
+		db:   database.New(),
+	}
+
+}
+func WithTestDB() optFunc {
+	return func(o *opts) {
+		o.db = database.New(database.TestConfig())
+	}
+}
+
+func NewRouter(opts ...optFunc) *Router {
+	opt := defaultOpts()
+	for _, fn := range opts {
+		fn(opt)
+	}
+	err := opt.db.Connect()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &Router{
+		port: opt.port,
+		db:   opt.db,
+	}
+}
+
+// New creates a new server instance
+func New() *http.Server {
 
 	port, _ := strconv.Atoi(os.Getenv("PORT"))
-	NewServer := &Server{
+	NewServer := &Router{
 		port: port,
 
 		db: database.New(),
