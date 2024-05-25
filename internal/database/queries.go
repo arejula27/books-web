@@ -209,7 +209,7 @@ func (s *service) selectBookByID(bookID int) (models.Book, error) {
 func (s *service) selectReviewsByBookID(bookID int) ([]models.Review, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	query := `SELECT r.comment,tr.creation_date, u.name FROM reviews r INNER JOIN timeline_records tr ON r.timeline_record_id = tr.id
+	query := `SELECT r.comment,tr.creation_date, u.name FROM reviews r LEFT JOIN timeline_records tr ON r.timeline_record_id = tr.id
 		INNER JOIN users u ON tr.user_id = u.id WHERE tr.book_id = $1 
 		ORDER BY tr.creation_date DESC`
 	rows, err := s.db.QueryContext(ctx, query, bookID)
