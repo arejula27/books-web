@@ -12,7 +12,11 @@ import "bytes"
 
 import "books/web/layouts"
 
-func AddBookPage() templ.Component {
+type AddBookPageProps struct {
+	Tags []string
+}
+
+func AddBookPage(props AddBookPageProps) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -31,7 +35,69 @@ func AddBookPage() templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1>Add Book</h1><form action=\"/addBook\" method=\"post\"><div><label for=\"title\">Título</label> <input type=\"text\" id=\"title\" name=\"title\" required></div><div><label for=\"author\">Autor</label> <input type=\"text\" id=\"author\" name=\"author\" required></div><div><label for=\"editorial\">Editorial</label> <input type=\"text\" id=\"editorial\" name=\"editorial\" required></div><div><label for=\"isbn\">ISBN</label> <input type=\"text\" id=\"isbn\" name=\"isbn\" required></div><div><label for=\"image\">Foto del libro</label> <input type=\"file\" id=\"image\" name=\"image\"></div><div><label for=\"review\">Reseña</label> <textarea id=\"review\" name=\"review\" required></textarea></div><button type=\"submit\">Subir</button></form>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1>Add Book</h1><form action=\"/addBook\" method=\"post\" id=\"add_book_form\"><div><label for=\"title\">Título</label> <input type=\"text\" id=\"title\" name=\"title\" required></div><div><label for=\"author\">Autor</label> <input type=\"text\" id=\"author\" name=\"author\" required></div><div><label for=\"editorial\">Editorial</label> <input type=\"text\" id=\"editorial\" name=\"editorial\" required></div><div><label for=\"isbn\">ISBN</label> <input type=\"text\" id=\"isbn\" name=\"isbn\" required></div><div><label for=\"review\">Reseña</label> <textarea id=\"review\" name=\"review\" required></textarea></div><div class=\"grid grid-cols-3 gap-4\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			for _, tag := range props.Tags {
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex items-center\"><input class=\"hidden peer\" type=\"checkbox\" value=\"true\" id=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var3 string
+				templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(tag)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/addNewBookPage.templ`, Line: 42, Col: 70}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" name=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var4 string
+				templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(tag)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/addNewBookPage.templ`, Line: 42, Col: 83}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"> <label class=\"block px-5 py-2 bg-gray-100 peer-checked:bg-gray-300 text-black rounded-full cursor-pointer transition-colors duration-300\" for=\"")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var5 string
+				templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(tag)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/addNewBookPage.templ`, Line: 45, Col: 16}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				var templ_7745c5c3_Var6 string
+				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(tag)
+				if templ_7745c5c3_Err != nil {
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/addNewBookPage.templ`, Line: 46, Col: 12}
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><button type=\"submit\">Subir</button></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

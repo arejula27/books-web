@@ -3,7 +3,8 @@ module books
 go 1.22.2
 
 require (
-	github.com/a-h/templ v0.2.697
+	github.com/PuerkitoBio/goquery v1.9.2
+	github.com/a-h/templ v0.2.707
 	github.com/gorilla/sessions v1.1.1
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/joho/godotenv v1.5.1
@@ -14,7 +15,6 @@ require (
 require (
 	cloud.google.com/go/compute v1.20.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
-	github.com/PuerkitoBio/goquery v1.9.2 // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect

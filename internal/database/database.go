@@ -24,6 +24,7 @@ type Service interface {
 	GetBooksFromUser(userID int) ([]models.Book, error)
 	GetBookByID(bookID int) (models.Book, error)
 	GetReviewsByBookID(bookID int) ([]models.Review, error)
+	GetAllTags() ([]string, error)
 }
 
 type service struct {
@@ -33,8 +34,6 @@ type service struct {
 	appEnv  string
 	verbose bool
 }
-
-var ()
 
 type OptFunc func(*opts)
 
@@ -121,9 +120,18 @@ func (s *service) Connect() error {
 	if s.reset == "true" && s.appEnv != "production" {
 		s.logMsg("resetting database")
 		s.clearDatabase()
+		s.createTables()
+
+		//populate default tags
+		defaultTags := []string{"fiction", "terror", "classic", "romance", "sci-fiction", "mystery", "thriller", "biography", "fantasy", "non-fiction"}
+		err := s.insertTags(defaultTags)
+		if nil != err {
+			return err
+		}
 	}
-	s.createTables()
+
 	return nil
+
 }
 
 // Health checks the health of the database, returns a map with a message or stops the application if the database is down
@@ -159,16 +167,6 @@ func (s *service) AddUserIfNotExists(email, name, imageURL string) (int, error) 
 	}
 	//return error
 	return 0, err
-}
-func (s *service) AddBook(book models.Book, userID int, review string) (int, error) {
-	//insert book
-	bookID, err := s.insertBook(book, userID, review)
-	if nil != err {
-		return 0, err
-	}
-	//return book
-	return bookID, nil
-
 }
 func (s *service) GetBooksFromUser(userID int) ([]models.Book, error) {
 	//get books from user

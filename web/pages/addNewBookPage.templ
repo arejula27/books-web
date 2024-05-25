@@ -2,10 +2,14 @@ package pages
 
 import "books/web/layouts"
 
-templ AddBookPage() {
+type AddBookPageProps struct {
+	Tags []string
+}
+
+templ AddBookPage(props AddBookPageProps) {
 	@layouts.Base() {
 		<h1>Add Book</h1>
-		<form action="/addBook" method="post">
+		<form action="/addBook" method="post" id="add_book_form">
 			<div>
 				<label for="title">Título</label>
 				<input type="text" id="title" name="title" required/>
@@ -22,13 +26,26 @@ templ AddBookPage() {
 				<label for="isbn">ISBN</label>
 				<input type="text" id="isbn" name="isbn" required/>
 			</div>
-			<div>
-				<label for="image">Foto del libro</label>
-				<input type="file" id="image" name="image"/>
-			</div>
+			/*
+	<div>
+		<label for="image">Foto del libro</label>
+		<input type="file" id="image" name="image" />
+	</div>
+	*/
 			<div>
 				<label for="review">Reseña</label>
 				<textarea id="review" name="review" required></textarea>
+			</div>
+			<div class="grid grid-cols-3 gap-4">
+				for _, tag := range props.Tags {
+					<div class="flex items-center">
+						<input class="hidden peer" type="checkbox" value="true" id={ tag } name={ tag }/>
+						<label
+							class="block px-5 py-2 bg-gray-100 peer-checked:bg-gray-300 text-black rounded-full cursor-pointer transition-colors duration-300"
+							for={ tag }
+						>{ tag }</label>
+					</div>
+				}
 			</div>
 			<button type="submit">Subir</button>
 		</form>

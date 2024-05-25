@@ -16,6 +16,7 @@ type Book struct {
 	Author    string
 	Editorial string
 	ISBN      string
+	Tags      []string
 }
 
 type Review struct {

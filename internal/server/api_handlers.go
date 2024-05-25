@@ -14,14 +14,32 @@ func (s *Router) AddBookHandler(c echo.Context) error {
 	//get the book from the form
 
 	var book models.Book
-	book.Title = c.FormValue("title")
-	book.Author = c.FormValue("author")
-	book.Editorial = c.FormValue("editorial")
-	book.ISBN = c.FormValue("isbn")
+	var review string
+	book.Tags = []string{}
 	userID := c.Get("user").(models.User).ID
-	review := c.FormValue("review")
+	params, err := c.FormParams()
+	if err != nil {
+		return err
+	}
+	for param, value := range params {
+		if param == "title" {
+			book.Title = value[0]
+		} else if param == "author" {
+			book.Author = value[0]
+		} else if param == "editorial" {
+			book.Editorial = value[0]
+		} else if param == "isbn" {
+			book.ISBN = value[0]
+		} else if param == "review" {
+			review = value[0]
+		} else {
+			book.Tags = append(book.Tags, param)
 
-	_, err := s.db.AddBook(book, userID, review)
+		}
+
+	}
+
+	_, err = s.db.AddBook(book, userID, review)
 	if err != nil {
 		return err
 	}

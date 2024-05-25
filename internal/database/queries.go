@@ -26,8 +26,8 @@ const (
 				REFERENCES VOLUMES(id)
 				ON DELETE CASCADE
 				ON UPDATE CASCADE
-	);
-	`
+	);`
+
 	createTableVolumes = `
 		CREATE TABLE VOLUMES (
 		id SERIAL PRIMARY KEY,
@@ -36,6 +36,25 @@ const (
 		author VARCHAR(100) NOT NULL,
 		editorial VARCHAR(100) NOT NULL
 );	`
+
+	createTableBooksTags = `
+		CREATE TABLE BOOKS_TAGS (
+		book_id INT NOT NULL,
+		tag_id INT NOT NULL,
+		CONSTRAINT pk_books_tags
+			PRIMARY KEY (book_id, tag_id),
+		CONSTRAINT fk_book
+			FOREIGN KEY(book_id)
+				REFERENCES BOOKS(id)
+				ON DELETE CASCADE
+				ON UPDATE CASCADE,
+		CONSTRAINT fk_tag
+			FOREIGN KEY(tag_id)
+				REFERENCES TAGS(id)
+				ON DELETE CASCADE	
+				ON UPDATE CASCADE
+	);`
+
 	createTableTimelineRecords = `
 	CREATE TABLE TIMELINE_RECORDS (
 		id SERIAL PRIMARY KEY,
@@ -67,6 +86,12 @@ const (
 			ON UPDATE CASCADE
 	);
 	`
+	createTableTags = `
+		CREATE TABLE TAGS (
+		id SERIAL PRIMARY KEY,
+		name VARCHAR(50) NOT NULL UNIQUE
+	);
+	`
 )
 
 // clearDatabase drops all tables
@@ -84,6 +109,11 @@ func (s *service) createTables() {
 	_, err := s.db.ExecContext(ctx, createTableUsers)
 	if err != nil {
 		s.logMsg("User table already exists")
+	}
+	// create tags create
+	_, err = s.db.ExecContext(ctx, createTableTags)
+	if err != nil {
+		s.logMsg("Tags table already exists")
 	}
 	// create volumes table
 	_, err = s.db.ExecContext(ctx, createTableVolumes)
@@ -103,7 +133,24 @@ func (s *service) createTables() {
 	if err != nil {
 		s.logMsg("Reviews table already exists")
 	}
+	_, err = s.db.ExecContext(ctx, createTableBooksTags)
+	if err != nil {
+		s.logMsg("Books tags table already exists")
+	}
 
+}
+
+func (s *service) insertTags(tags []string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	query := `INSERT INTO tags (name) VALUES ($1)`
+	for _, tag := range tags {
+		_, err := s.db.ExecContext(ctx, query, tag)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (s *service) insertUser(email, name, imageURL string) (int, error) {
@@ -129,7 +176,7 @@ func (s *service) getUserByEmail(email string) (models.User, error) {
 	return user, err
 }
 
-func (s *service) insertBook(book models.Book, userID int, review string) (int, error) {
+func (s *service) AddBook(book models.Book, userID int, review string) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	tx, err := s.db.BeginTx(ctx, nil)
@@ -168,6 +215,15 @@ func (s *service) insertBook(book models.Book, userID int, review string) (int, 
 	if err != nil {
 		tx.Rollback()
 		return 0, err
+	}
+	//add tags to book
+	for _, tag := range book.Tags {
+		insertTag := `INSERT INTO books_tags (book_id, tag_id) VALUES ($1, (SELECT id FROM tags WHERE name = $2))`
+		_, err = tx.ExecContext(ctx, insertTag, bookID, tag)
+		if err != nil {
+			tx.Rollback()
+			return 0, err
+		}
 	}
 
 	err = tx.Commit()
@@ -244,4 +300,25 @@ func (s *service) selectReviewsByBookID(bookID int) ([]models.Review, error) {
 		reviews = append(reviews, review)
 	}
 	return reviews, nil
+}
+
+func (s *service) GetAllTags() ([]string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	query := `SELECT name FROM tags`
+	rows, err := s.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var tags []string
+	for rows.Next() {
+		var tag string
+		err = rows.Scan(&tag)
+		if err != nil {
+			return nil, err
+		}
+		tags = append(tags, tag)
+	}
+	return tags, nil
 }

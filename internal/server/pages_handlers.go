@@ -22,7 +22,14 @@ func (s *Router) HomePageHandler(c echo.Context) error {
 }
 
 func (s *Router) AddBookPageHandler(c echo.Context) error {
-	component := pages.AddBookPage()
+	tags, err := s.db.GetAllTags()
+	if err != nil {
+		return err
+	}
+	props := pages.AddBookPageProps{
+		Tags: tags,
+	}
+	component := pages.AddBookPage(props)
 	return component.Render(c.Request().Context(), c.Response())
 }
 

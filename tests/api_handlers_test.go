@@ -49,6 +49,7 @@ func TestAddBookHandler(t *testing.T) {
 		"editorial": {"test_editorial"},
 		"isbn":      {"test_isbn"},
 		"review":    {"test_review"},
+		"classic":   {"classic"},
 	}
 	resp := httptest.NewRecorder()
 	c := e.NewContext(req, resp)
