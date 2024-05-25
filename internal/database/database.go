@@ -23,6 +23,7 @@ type Service interface {
 	AddBook(book models.Book, userID int, review string) (int, error)
 	GetBooksFromUser(userID int) ([]models.Book, error)
 	GetBookByID(bookID int) (models.Book, error)
+	GetReviewsByBookID(bookID int) ([]models.Review, error)
 }
 
 type service struct {
@@ -184,4 +185,12 @@ func (s *service) GetBookByID(bookID int) (models.Book, error) {
 		return models.Book{}, err
 	}
 	return book, nil
+}
+
+func (s *service) GetReviewsByBookID(bookID int) ([]models.Review, error) {
+	reviews, err := s.selectReviewsByBookID(bookID)
+	if nil != err {
+		return nil, err
+	}
+	return reviews, nil
 }

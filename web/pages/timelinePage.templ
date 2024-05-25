@@ -1,0 +1,29 @@
+package pages
+
+import "books/internal/models"
+import "books/web/layouts"
+
+type TimelinePageProps struct {
+	Book     models.Book
+	Timeline []models.Review
+}
+
+templ TimelinePage(props TimelinePageProps) {
+	@layouts.Base() {
+		<div>
+			<h1 class="text-black text-6xl">{ props.Book.Title }</h1>
+			<div>
+				for _, review := range props.Timeline {
+					//review card
+					<div>
+						<p>
+							{ review.User.Name }
+						</p>
+						<p>{ review.Comment }</p>
+						<p>{ review.Date.Format("2006-01-02, 15:04") }</p>
+					</div>
+				}
+			</div>
+		</div>
+	}
+}

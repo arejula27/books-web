@@ -36,6 +36,7 @@ func (s *Router) RegisterRoutes() http.Handler {
 	pr := e.Group("", s.authorizationMiddleware)
 	pr.GET("/home", s.HomePageHandler)
 	pr.GET("/addBook", echo.WrapHandler(templ.Handler(pages.AddBookPage())))
+	pr.GET("/book/:id", s.BookPageHandler)
 
 	// API routes
 	pr.POST("/addBook", s.AddBookHandler)

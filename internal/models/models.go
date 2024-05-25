@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 // User is a struct that represents a user
 type User struct {
 	ID       int
@@ -16,8 +18,8 @@ type Book struct {
 }
 
 type Review struct {
-	ID     int
-	Review string
-	User   int
-	Book   int
+	ID      int
+	Comment string
+	User    User
+	Date    time.Time
 }
