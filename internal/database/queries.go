@@ -69,28 +69,11 @@ const (
 	`
 )
 
+// clearDatabase drops all tables
 func (s *service) clearDatabase() {
-
-	_, err := s.db.Exec("DROP TABLE IF EXISTS reviews")
+	_, err := s.db.Exec("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
 	if err != nil {
-		log.Println(err)
-	}
-	_, err = s.db.Exec("DROP TABLE IF EXISTS timeline_records")
-	if err != nil {
-		log.Println(err)
-	}
-	_, err = s.db.Exec("DROP TABLE IF EXISTS users")
-	if err != nil {
-		log.Println(err)
-	}
-	_, err = s.db.Exec("DROP TABLE IF EXISTS books")
-
-	if err != nil {
-		log.Println(err)
-	}
-	_, err = s.db.Exec("DROP TABLE IF EXISTS volumes")
-	if err != nil {
-		log.Println(err)
+		log.Fatalf("Error dropping database: %v", err)
 	}
 }
 
