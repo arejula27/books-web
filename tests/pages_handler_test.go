@@ -14,7 +14,12 @@ func TestHomePage(t *testing.T) {
 	////////////////////////////////////////
 	/////Setup database
 	////////////////////////////////////////
-	_, err := setupDB()
+	conn, err := connectDB()
+	if err != nil {
+		t.Errorf("Error setting up database: %v", err)
+		return
+	}
+	err = setupDB(conn)
 	if err != nil {
 		t.Errorf("Error setting up database: %v", err)
 		return
@@ -46,18 +51,13 @@ func TestHomePage(t *testing.T) {
 		return
 	}
 	booksHTML := doc.Find(`[data-testid="BooksList"] a`)
-	if booksHTML.Length() != 2 {
+	if booksHTML.Length() != len(books) {
 		t.Errorf("handler() wrong number of books = %v", booksHTML.Length())
 	}
 	booksHTML.Each(func(i int, s *goquery.Selection) {
-		if i == 0 {
-			if s.Text() != books[2].Title {
-				t.Errorf("handler() wrong title = %v", s.Text())
-			}
-		} else if i == 1 {
-			if s.Text() != books[0].Title {
-				t.Errorf("handler() wrong title = %v", s.Text())
-			}
+
+		if s.Text() != books[len(books)-i-1].Title {
+			t.Errorf("handler() wrong title = %v", s.Text())
 		}
 	})
 }
@@ -66,6 +66,17 @@ func TestAddBookPage(t *testing.T) {
 	////////////////////////////////////////
 	// Setup server
 	////////////////////////////////////////
+	conn, err := connectDB()
+	if err != nil {
+		t.Errorf("Error setting up database: %v", err)
+		return
+	}
+	err = setupDB(conn)
+	if err != nil {
+		t.Errorf("Error setting up database: %v", err)
+		return
+	}
+
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodGet, "/addBook", nil)
 	resp := httptest.NewRecorder()
@@ -88,7 +99,12 @@ func TestBookPage(t *testing.T) {
 	////////////////////////////////////////
 	/////Setup database
 	////////////////////////////////////////
-	_, err := setupDB()
+	conn, err := connectDB()
+	if err != nil {
+		t.Errorf("Error setting up database: %v", err)
+		return
+	}
+	err = setupDB(conn)
 	if err != nil {
 		t.Errorf("Error setting up database: %v", err)
 		return
@@ -121,11 +137,17 @@ func TestGetBookPage(t *testing.T) {
 	////////////////////////////////////////
 	/////Setup database
 	////////////////////////////////////////
-	_, err := setupDB()
+	conn, err := connectDB()
 	if err != nil {
 		t.Errorf("Error setting up database: %v", err)
 		return
 	}
+	err = setupDB(conn)
+	if err != nil {
+		t.Errorf("Error setting up database: %v", err)
+		return
+	}
+
 	////////////////////////////////////////
 	// Setup server
 	////////////////////////////////////////

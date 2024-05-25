@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	createTableUsers = `
+	CreateTableUsers = `
 		CREATE TABLE USERS (
 		id SERIAL PRIMARY KEY,
 		email VARCHAR(255) NOT NULL UNIQUE,
@@ -16,7 +16,7 @@ const (
 		image_url VARCHAR(255),
 		registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 	);`
-	createTableBooks = `
+	CreateTableBooks = `
 		CREATE TABLE BOOKS (
 		id SERIAL PRIMARY KEY,
 		volume_id INT NOT NULL,
@@ -28,7 +28,7 @@ const (
 				ON UPDATE CASCADE
 	);`
 
-	createTableVolumes = `
+	CreateTableVolumes = `
 		CREATE TABLE VOLUMES (
 		id SERIAL PRIMARY KEY,
 		isbn VARCHAR(13) NOT NULL UNIQUE,
@@ -37,7 +37,7 @@ const (
 		editorial VARCHAR(100) NOT NULL
 );	`
 
-	createTableBooksTags = `
+	CreateTableBooksTags = `
 		CREATE TABLE BOOKS_TAGS (
 		book_id INT NOT NULL,
 		tag_id INT NOT NULL,
@@ -55,7 +55,7 @@ const (
 				ON UPDATE CASCADE
 	);`
 
-	createTableTimelineRecords = `
+	CreateTableTimelineRecords = `
 	CREATE TABLE TIMELINE_RECORDS (
 		id SERIAL PRIMARY KEY,
 		book_id INT NOT NULL, 
@@ -75,7 +75,7 @@ const (
 				ON UPDATE CASCADE
 	);
 	`
-	createTableReviews = `
+	CreateTableReviews = `
 		CREATE TABLE REVIEWS (
 		timeline_record_id INT PRIMARY KEY,
 		comment TEXT NOT NULL,
@@ -86,7 +86,7 @@ const (
 			ON UPDATE CASCADE
 	);
 	`
-	createTableTags = `
+	CreateTableTags = `
 		CREATE TABLE TAGS (
 		id SERIAL PRIMARY KEY,
 		name VARCHAR(50) NOT NULL UNIQUE
@@ -106,34 +106,34 @@ func (s *service) createTables() {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	// create users table
-	_, err := s.db.ExecContext(ctx, createTableUsers)
+	_, err := s.db.ExecContext(ctx, CreateTableUsers)
 	if err != nil {
 		s.logMsg("User table already exists")
 	}
 	// create tags create
-	_, err = s.db.ExecContext(ctx, createTableTags)
+	_, err = s.db.ExecContext(ctx, CreateTableTags)
 	if err != nil {
 		s.logMsg("Tags table already exists")
 	}
 	// create volumes table
-	_, err = s.db.ExecContext(ctx, createTableVolumes)
+	_, err = s.db.ExecContext(ctx, CreateTableVolumes)
 	if err != nil {
 		s.logMsg("Volumes table already exists")
 	}
 	// create books table
-	_, err = s.db.ExecContext(ctx, createTableBooks)
+	_, err = s.db.ExecContext(ctx, CreateTableBooks)
 	if err != nil {
 		s.logMsg("Books table already exists")
 	}
-	_, err = s.db.ExecContext(ctx, createTableTimelineRecords)
+	_, err = s.db.ExecContext(ctx, CreateTableTimelineRecords)
 	if err != nil {
 		s.logMsg("Timeline records table already exists")
 	}
-	_, err = s.db.ExecContext(ctx, createTableReviews)
+	_, err = s.db.ExecContext(ctx, CreateTableReviews)
 	if err != nil {
 		s.logMsg("Reviews table already exists")
 	}
-	_, err = s.db.ExecContext(ctx, createTableBooksTags)
+	_, err = s.db.ExecContext(ctx, CreateTableBooksTags)
 	if err != nil {
 		s.logMsg("Books tags table already exists")
 	}
