@@ -1,4 +1,4 @@
-package tests
+package utils
 
 import (
 	"books/internal/database"
@@ -15,50 +15,67 @@ import (
 // The user test_name has 3 books, each with a different tag
 ////////////////////////////////////////////////////////////
 
-var (
-	users = []models.User{
-		{
-			Name:  "test_name",
-			Email: "test_mail@mail.test",
-		},
-		{
-			Name:  "test_name2",
-			Email: "test_mail2@mail.test",
-		},
-	}
-	books = []models.Book{
-		{
-			Title:     "test_title",
-			Author:    "test_autor",
-			Editorial: "test_editorial",
-			ISBN:      "test_isbn",
-		},
-		{
-			Title:     "test_title2",
-			Author:    "test_autor2",
-			Editorial: "test_editorial2",
-			ISBN:      "test_isbn2",
-		},
-		{
-			Title:     "test_title3",
-			Author:    "test_autor3",
-			Editorial: "test_editorial3",
-			ISBN:      "test_isbn3",
-		},
-	}
-	tags = []string{
-		"tag1",
-		"tag2",
-		"tag3",
-	}
-)
+type testData struct {
+	Users []models.User
+	Books []models.Book
+	Tags  []string
+}
 
-func connectDB() (*sql.DB, error) {
-	err := godotenv.Load("../.env.test")
+func LoadEnv() {
+	//load .env file
+	err := godotenv.Load("../../.env.test")
 	if err != nil {
 		log.Println("Error loading .env file")
-		return nil, err
+		log.Println("===================")
+		log.Println(err)
+		log.Println("===================")
+
 	}
+}
+
+func TestScenario1Data() testData {
+
+	return testData{
+		Users: []models.User{
+			{
+				Name:  "test_name",
+				Email: "test_mail@mail.test",
+			},
+			{
+				Name:  "test_name2",
+				Email: "test_mail2@mail.test",
+			},
+		},
+
+		Books: []models.Book{
+			{
+				Title:     "test_title",
+				Author:    "test_autor",
+				Editorial: "test_editorial",
+				ISBN:      "test_isbn",
+			},
+			{
+				Title:     "test_title2",
+				Author:    "test_autor2",
+				Editorial: "test_editorial2",
+				ISBN:      "test_isbn2",
+			},
+			{
+				Title:     "test_title3",
+				Author:    "test_autor3",
+				Editorial: "test_editorial3",
+				ISBN:      "test_isbn3",
+			},
+		},
+		Tags: []string{
+			"tag1",
+			"tag2",
+			"tag3",
+		},
+	}
+}
+
+func ConnectDB() (*sql.DB, error) {
 
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
@@ -74,7 +91,7 @@ func connectDB() (*sql.DB, error) {
 	return db, nil
 }
 
-func setupDB(db *sql.DB) error {
+func SetupDB(db *sql.DB, data *testData) error {
 	//clear database
 	_, err := db.Exec("DROP SCHEMA public CASCADE; CREATE SCHEMA public;")
 	if err != nil {
@@ -100,18 +117,18 @@ func setupDB(db *sql.DB) error {
 	}
 
 	//insert some users
-	for i, user := range users {
+	for i, user := range data.Users {
 		var id int
 		err = db.QueryRow("INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id", user.Name, user.Email).Scan(&id)
 		if err != nil {
 
 			log.Fatalf("Error inserting user: %v", err)
 		}
-		users[i].ID = id
+		data.Users[i].ID = id
 	}
 
 	//insert tags
-	for _, tag := range tags {
+	for _, tag := range data.Tags {
 		var id int
 		err = db.QueryRow("INSERT INTO tags (name) VALUES ($1) RETURNING id", tag).Scan(&id)
 		if err != nil {
@@ -120,7 +137,7 @@ func setupDB(db *sql.DB) error {
 	}
 
 	//insert books
-	for i, book := range books {
+	for i, book := range data.Books {
 		var volumeID int
 		err = db.QueryRow("INSERT INTO volumes (title, author, editorial, isbn) VALUES ($1, $2, $3, $4) RETURNING id", book.Title, book.Author, book.Editorial, book.ISBN).Scan(&volumeID)
 		if err != nil {
@@ -132,7 +149,7 @@ func setupDB(db *sql.DB) error {
 			log.Fatalf("Error inserting book: %v", err)
 		}
 		//insert tags
-		tagID := (i % len(tags)) + 1
+		tagID := (i % len(data.Tags)) + 1
 		_, err = db.Exec("INSERT INTO books_tags (book_id, tag_id) VALUES ($1, $2)", bookID, tagID)
 		if err != nil {
 			log.Fatalf("Error inserting book tag: %v", err)

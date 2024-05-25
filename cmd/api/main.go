@@ -4,6 +4,7 @@ package main
 import (
 	"books/internal/server"
 	"fmt"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {

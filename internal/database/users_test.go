@@ -1,13 +1,18 @@
-package tests
+package database_test
 
 import (
 	"books/internal/database"
+	"books/utils"
 	"testing"
 )
 
+func init() {
+	utils.LoadEnv()
+}
+
 func TestDatabaseUsers(t *testing.T) {
 	// connection for checknig actions, it will set up some initial data
-	conn, err := connectDB()
+	conn, err := utils.ConnectDB()
 	if err != nil {
 		t.Errorf("Error setting up database: %v", err)
 		return
@@ -21,13 +26,14 @@ func TestDatabaseUsers(t *testing.T) {
 
 	// AddUserIfNotExists
 	t.Run("Add new user", func(t *testing.T) {
-		setupDB(conn)
+		testData := utils.TestScenario1Data()
+		utils.SetupDB(conn, &testData)
 		newUserID, err := db.AddUserIfNotExists("new_user", "new_user@mail.com", "new_user_image")
 		if err != nil {
 			t.Errorf("Error adding new user: %v", err)
 			return
 		}
-		correctID := len(users) + 1
+		correctID := len(testData.Users) + 1
 		if newUserID != correctID {
 			t.Errorf("Expected user ID to be %d, got %d", correctID, newUserID)
 		}
@@ -38,8 +44,8 @@ func TestDatabaseUsers(t *testing.T) {
 			t.Errorf("Error counting users: %v", err)
 			return
 		}
-		if count != len(users)+1 {
-			t.Errorf("Expected %d users, got %d", len(users)+1, count)
+		if count != len(testData.Users)+1 {
+			t.Errorf("Expected %d users, got %d", len(testData.Users)+1, count)
 		}
 
 	})

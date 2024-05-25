@@ -5,12 +5,9 @@ import (
 	"books/internal/models"
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 
 	_ "github.com/jackc/pgx/v5/stdlib" // initialize pgx driver
-	"github.com/joho/godotenv"
-	_ "github.com/joho/godotenv/autoload" // load .env file
 )
 
 // Service is an interface for the database service
@@ -61,11 +58,6 @@ func defaultOpts() *opts {
 func TestConfig() OptFunc {
 	return func(o *opts) {
 		//print the current directory
-		err := godotenv.Load("../.env.test")
-		if err != nil {
-			log.Println("Error loading .env file")
-
-		}
 
 		o.database = "books_test"
 		if os.Getenv("DB_DATABASE") != "" {

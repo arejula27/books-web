@@ -1,7 +1,8 @@
-package tests
+package server_test
 
 import (
 	"books/internal/server"
+	"books/utils"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,16 +11,21 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+func init() {
+	utils.LoadEnv()
+}
+
 func TestHomePage(t *testing.T) {
 	////////////////////////////////////////
 	/////Setup database
 	////////////////////////////////////////
-	conn, err := connectDB()
+	conn, err := utils.ConnectDB()
+	testData := utils.TestScenario1Data()
 	if err != nil {
 		t.Errorf("Error setting up database: %v", err)
 		return
 	}
-	err = setupDB(conn)
+	err = utils.SetupDB(conn, &testData)
 	if err != nil {
 		t.Errorf("Error setting up database: %v", err)
 		return
@@ -31,7 +37,7 @@ func TestHomePage(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	resp := httptest.NewRecorder()
 	c := e.NewContext(req, resp)
-	c.Set("user", users[0])
+	c.Set("user", testData.Users[0])
 	server := server.NewRouter(server.WithTestDB())
 
 	////////////////////////////////////////
@@ -51,12 +57,12 @@ func TestHomePage(t *testing.T) {
 		return
 	}
 	booksHTML := doc.Find(`[data-testid="BooksList"] a`)
-	if booksHTML.Length() != len(books) {
+	if booksHTML.Length() != len(testData.Books) {
 		t.Errorf("handler() wrong number of books = %v", booksHTML.Length())
 	}
 	booksHTML.Each(func(i int, s *goquery.Selection) {
 
-		if s.Text() != books[len(books)-i-1].Title {
+		if s.Text() != testData.Books[len(testData.Books)-i-1].Title {
 			t.Errorf("handler() wrong title = %v", s.Text())
 		}
 	})
@@ -66,12 +72,13 @@ func TestAddBookPage(t *testing.T) {
 	////////////////////////////////////////
 	// Setup server
 	////////////////////////////////////////
-	conn, err := connectDB()
+	conn, err := utils.ConnectDB()
+	testData := utils.TestScenario1Data()
 	if err != nil {
 		t.Errorf("Error setting up database: %v", err)
 		return
 	}
-	err = setupDB(conn)
+	err = utils.SetupDB(conn, &testData)
 	if err != nil {
 		t.Errorf("Error setting up database: %v", err)
 		return
@@ -99,12 +106,13 @@ func TestBookPage(t *testing.T) {
 	////////////////////////////////////////
 	/////Setup database
 	////////////////////////////////////////
-	conn, err := connectDB()
+	conn, err := utils.ConnectDB()
+	testData := utils.TestScenario1Data()
 	if err != nil {
 		t.Errorf("Error setting up database: %v", err)
 		return
 	}
-	err = setupDB(conn)
+	err = utils.SetupDB(conn, &testData)
 	if err != nil {
 		t.Errorf("Error setting up database: %v", err)
 		return
@@ -118,7 +126,7 @@ func TestBookPage(t *testing.T) {
 	c := e.NewContext(req, resp)
 	c.SetParamNames("id")
 	c.SetParamValues("1")
-	c.Set("user", users[0])
+	c.Set("user", testData.Users[0])
 	server := server.NewRouter(server.WithTestDB())
 
 	////////////////////////////////////////
@@ -137,12 +145,13 @@ func TestGetBookPage(t *testing.T) {
 	////////////////////////////////////////
 	/////Setup database
 	////////////////////////////////////////
-	conn, err := connectDB()
+	conn, err := utils.ConnectDB()
+	testData := utils.TestScenario1Data()
 	if err != nil {
 		t.Errorf("Error setting up database: %v", err)
 		return
 	}
-	err = setupDB(conn)
+	err = utils.SetupDB(conn, &testData)
 	if err != nil {
 		t.Errorf("Error setting up database: %v", err)
 		return
@@ -155,7 +164,7 @@ func TestGetBookPage(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/getBook", nil)
 	resp := httptest.NewRecorder()
 	c := e.NewContext(req, resp)
-	c.Set("user", users[0])
+	c.Set("user", testData.Users[0])
 	server := server.NewRouter(server.WithTestDB())
 
 	////////////////////////////////////////

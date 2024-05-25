@@ -1,7 +1,8 @@
-package tests
+package server_test
 
 import (
 	"books/internal/server"
+	"books/utils"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -31,8 +32,8 @@ func TestAddBookHandler(t *testing.T) {
 	////////////////////////////////////////
 	// Setup database
 	////////////////////////////////////////
-
-	conn, err := connectDB()
+	data := utils.TestScenario1Data()
+	conn, err := utils.ConnectDB()
 	if err != nil {
 		t.Errorf("Error setting up database: %v", err)
 		return
@@ -51,33 +52,33 @@ func TestAddBookHandler(t *testing.T) {
 			testName: "Add new book and new volume",
 			forms: []map[string][]string{
 				map[string][]string{
-					"title":     {"test_title"},
-					"author":    {"test_author"},
-					"editorial": {"test_editorial"},
-					"isbn":      {"new_test_isbn"},
-					"review":    {"test_review"},
-					tags[0]:     {"true"},
+					"title":      {"test_title"},
+					"author":     {"test_author"},
+					"editorial":  {"test_editorial"},
+					"isbn":       {"new_test_isbn"},
+					"review":     {"test_review"},
+					data.Tags[0]: {"true"},
 				},
 			},
 			expectedCode:    http.StatusFound,
-			expedtedBooks:   len(books) + 1,
-			expectedVolumes: len(books) + 1,
+			expedtedBooks:   len(data.Books) + 1,
+			expectedVolumes: len(data.Books) + 1,
 		},
 		testCases{
 			testName: "Add book of an existing volume",
 			forms: []map[string][]string{
 				map[string][]string{
-					"title":     {"test_title"},
-					"author":    {"test_author"},
-					"editorial": {"test_editorial"},
-					"isbn":      {"test_isbn"},
-					"review":    {"test_review"},
-					tags[0]:     {"true"},
+					"title":      {"test_title"},
+					"author":     {"test_author"},
+					"editorial":  {"test_editorial"},
+					"isbn":       {"test_isbn"},
+					"review":     {"test_review"},
+					data.Tags[0]: {"true"},
 				},
 			},
 			expectedCode:    http.StatusFound,
-			expedtedBooks:   len(books) + 1,
-			expectedVolumes: len(books),
+			expedtedBooks:   len(data.Books) + 1,
+			expectedVolumes: len(data.Books),
 		},
 	}
 
@@ -90,12 +91,13 @@ func TestAddBookHandler(t *testing.T) {
 
 		t.Run(testCase.testName, func(t *testing.T) {
 			for _, form := range testCase.forms {
-				setupDB(conn)
+				utils.SetupDB(conn, &data)
+
 				req := httptest.NewRequest(http.MethodPost, "/addBook", nil)
 				req.Form = form
 				resp := httptest.NewRecorder()
 				c := e.NewContext(req, resp)
-				c.Set("user", users[0])
+				c.Set("user", data.Users[0])
 
 				//set form values
 				router := server.NewRouter(server.WithTestDB())
