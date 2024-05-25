@@ -16,7 +16,7 @@ import (
 // Service is an interface for the database service
 type Service interface {
 	Connect() error
-	Health() map[string]string
+	Health() error
 	AddUserIfNotExists(email, name, imageURL string) (int, error)
 	AddBook(book models.Book, userID int, review string) (int, error)
 	GetBooksFromUser(userID int) ([]models.Book, error)

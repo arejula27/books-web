@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
 	"time"
 )
@@ -172,16 +171,14 @@ func (s *service) Connect() error {
 }
 
 // Health checks the health of the database, returns a map with a message or stops the application if the database is down
-func (s *service) Health() map[string]string {
+func (s *service) Health() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
 	err := s.db.PingContext(ctx)
 	if err != nil {
-		log.Fatalf(fmt.Sprintf("db down: %v", err))
+		return err
 	}
 
-	return map[string]string{
-		"message": "It's healthy",
-	}
+	return nil
 }

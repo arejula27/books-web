@@ -8,7 +8,12 @@ import (
 )
 
 func (s *Router) HealthHandler(c echo.Context) error {
-	return c.JSON(http.StatusOK, s.db.Health())
+	err := s.db.Health()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusOK, nil)
 }
 func (s *Router) AddBookHandler(c echo.Context) error {
 	//get the book from the form
