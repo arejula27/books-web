@@ -3,7 +3,6 @@ package tests
 import (
 	"books/internal/database"
 	"books/internal/models"
-	"log"
 )
 
 var (
@@ -22,16 +21,19 @@ var (
 			Title:     "test_title",
 			Author:    "test_autor",
 			Editorial: "test_editorial",
+			ISBN:      "test_isbn",
 		},
 		{
 			Title:     "test_title2",
 			Author:    "test_autor2",
 			Editorial: "test_editorial2",
+			ISBN:      "test_isbn2",
 		},
 		{
 			Title:     "test_title3",
 			Author:    "test_autor3",
 			Editorial: "test_editorial3",
+			ISBN:      "test_isbn3",
 		},
 	}
 )
@@ -50,7 +52,6 @@ func setupDB() (*database.Service, error) {
 			return nil, err
 		}
 	}
-	log.Println(users[0].ID, users[1].ID)
 
 	//add books
 

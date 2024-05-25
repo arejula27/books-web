@@ -17,6 +17,7 @@ func (s *Router) AddBookHandler(c echo.Context) error {
 	book.Title = c.FormValue("title")
 	book.Author = c.FormValue("author")
 	book.Editorial = c.FormValue("editorial")
+	book.ISBN = c.FormValue("isbn")
 	userID := c.Get("user").(models.User).ID
 	review := c.FormValue("review")
 

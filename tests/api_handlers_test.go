@@ -43,9 +43,18 @@ func TestAddBookHandler(t *testing.T) {
 	////////////////////////////////////////
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodPost, "/addBook", nil)
+	req.Form = map[string][]string{
+		"title":     {"test_title"},
+		"author":    {"test_author"},
+		"editorial": {"test_editorial"},
+		"isbn":      {"test_isbn"},
+		"review":    {"test_review"},
+	}
 	resp := httptest.NewRecorder()
 	c := e.NewContext(req, resp)
 	c.Set("user", users[0])
+
+	//set form values
 	router := server.NewRouter(server.WithTestDB())
 
 	////////////////////////////////////////

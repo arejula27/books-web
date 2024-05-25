@@ -11,8 +11,13 @@ import "io"
 import "bytes"
 
 import "books/web/layouts"
+import "strconv"
 
-func AddBookPage() templ.Component {
+type GetBookPageProps struct {
+	UserID int
+}
+
+func GetBookPage(props GetBookPageProps) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -31,7 +36,20 @@ func AddBookPage() templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1>Add Book</h1><form action=\"/addBook\" method=\"post\"><div><label for=\"title\">Título</label> <input type=\"text\" id=\"title\" name=\"title\" required></div><div><label for=\"author\">Autor</label> <input type=\"text\" id=\"author\" name=\"author\" required></div><div><label for=\"editorial\">Editorial</label> <input type=\"text\" id=\"editorial\" name=\"editorial\" required></div><div><label for=\"isbn\">ISBN</label> <input type=\"text\" id=\"isbn\" name=\"isbn\" required></div><div><label for=\"image\">Foto del libro</label> <input type=\"file\" id=\"image\" name=\"image\"></div><div><label for=\"review\">Reseña</label> <textarea id=\"review\" name=\"review\" required></textarea></div><button type=\"submit\">Subir</button></form>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1>Get Book</h1><p>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(props.UserID))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `web/pages/getBook.templ`, Line: 13, Col: 33}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

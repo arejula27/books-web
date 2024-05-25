@@ -55,6 +55,7 @@ func defaultOpts() *opts {
 		database: os.Getenv("DB_DATABASE"),
 		password: os.Getenv("DB_PASSWORD"),
 		username: os.Getenv("DB_USERNAME"),
+		verbose:  os.Getenv("VERBOSE") == "true",
 		port:     os.Getenv("DB_PORT"),
 		host:     os.Getenv("DB_HOST"),
 		reset:    os.Getenv("DB_RESET"),

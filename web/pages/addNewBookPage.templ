@@ -3,30 +3,34 @@ package pages
 import "books/web/layouts"
 
 templ AddBookPage() {
-@layouts.Base() {
-<h1>Add Book</h1>
-<form action="/addBook" method="post">
-	<div>
-		<label for="title">Título</label>
-		<input type="text" id="title" name="title" required />
-	</div>
-	<div>
-		<label for="author">Autor</label>
-		<input type="text" id="author" name="author" required />
-	</div>
-	<div>
-		<label for="editorial">Editorial</label>
-		<input type="text" id="editorial" name="editorial" required />
-	</div>
-	<div>
-		<label for="image">Foto del libro</label>
-		<input type="file" id="image" name="image" />
-	</div>
-	<div>
-		<label for="review">Reseña</label>
-		<textarea id="review" name="review" required></textarea>
-	</div>
-	<button type="submit">Subir</button>
-</form>
-}
+	@layouts.Base() {
+		<h1>Add Book</h1>
+		<form action="/addBook" method="post">
+			<div>
+				<label for="title">Título</label>
+				<input type="text" id="title" name="title" required/>
+			</div>
+			<div>
+				<label for="author">Autor</label>
+				<input type="text" id="author" name="author" required/>
+			</div>
+			<div>
+				<label for="editorial">Editorial</label>
+				<input type="text" id="editorial" name="editorial" required/>
+			</div>
+			<div>
+				<label for="isbn">ISBN</label>
+				<input type="text" id="isbn" name="isbn" required/>
+			</div>
+			<div>
+				<label for="image">Foto del libro</label>
+				<input type="file" id="image" name="image"/>
+			</div>
+			<div>
+				<label for="review">Reseña</label>
+				<textarea id="review" name="review" required></textarea>
+			</div>
+			<button type="submit">Subir</button>
+		</form>
+	}
 }

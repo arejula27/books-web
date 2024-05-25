@@ -19,18 +19,30 @@ const (
 	createTableBooks = `
 		CREATE TABLE BOOKS (
 		id SERIAL PRIMARY KEY,
-		title VARCHAR(255) NOT NULL,
-		author VARCHAR(100) NOT NULL,
-		editorial VARCHAR(100) NOT NULL,
-		registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		volume_id INT NOT NULL,
+		registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		CONSTRAINT fk_volume
+			FOREIGN KEY(volume_id)
+				REFERENCES VOLUMES(id)
+				ON DELETE CASCADE
+				ON UPDATE CASCADE
 	);
 	`
+	createTableVolumes = `
+		CREATE TABLE VOLUMES (
+		id SERIAL PRIMARY KEY,
+		isbn VARCHAR(13) NOT NULL UNIQUE,
+		title VARCHAR(255) NOT NULL,
+		author VARCHAR(100) NOT NULL,
+		editorial VARCHAR(100) NOT NULL
+);	`
 	createTableTimelineRecords = `
 	CREATE TABLE TIMELINE_RECORDS (
 		id SERIAL PRIMARY KEY,
 		book_id INT NOT NULL, 
 		user_id INT NOT NULL,
 		received BOOLEAN DEFAULT FALSE,
+		willing_to_send BOOLEAN DEFAULT FALSE,
 		creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		CONSTRAINT fk_book
 			FOREIGN KEY(book_id) 
@@ -76,6 +88,10 @@ func (s *service) clearDatabase() {
 	if err != nil {
 		log.Println(err)
 	}
+	_, err = s.db.Exec("DROP TABLE IF EXISTS volumes")
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (s *service) createTables() {
@@ -85,6 +101,11 @@ func (s *service) createTables() {
 	_, err := s.db.ExecContext(ctx, createTableUsers)
 	if err != nil {
 		s.logMsg("User table already exists")
+	}
+	// create volumes table
+	_, err = s.db.ExecContext(ctx, createTableVolumes)
+	if err != nil {
+		s.logMsg("Volumes table already exists")
 	}
 	// create books table
 	_, err = s.db.ExecContext(ctx, createTableBooks)
@@ -128,14 +149,26 @@ func (s *service) getUserByEmail(email string) (models.User, error) {
 func (s *service) insertBook(book models.Book, userID int, review string) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	var bookID int
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return 0, err
 	}
-	insertBook := `INSERT INTO books (title, author, editorial) VALUES ($1, $2, $3) RETURNING id`
-	err = tx.QueryRowContext(ctx, insertBook, book.Title, book.Author, book.Editorial).Scan(&bookID)
+	var VolumeID int
+	// insert volume
+	// if the volume already exists, update the id for returning it
+	//When updating the query will detect a change on a row and will return it, if not
+	//the query will not trigger any change and will return nothing
+	insertVolume := `INSERT INTO volumes (isbn, title, author, editorial) VALUES ($1, $2, $3, $4)
+	ON CONFLICT (isbn) DO UPDATE SET id = volumes.id RETURNING id;`
+	err = tx.QueryRowContext(ctx, insertVolume, book.ISBN, book.Title, book.Author, book.Editorial).Scan(&VolumeID)
+	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
 
+	var bookID int
+	insertBook := `INSERT INTO books (volume_id) VALUES ($1) RETURNING id`
+	err = tx.QueryRowContext(ctx, insertBook, VolumeID).Scan(&bookID)
 	if err != nil {
 		tx.Rollback()
 		return 0, err
@@ -175,8 +208,8 @@ func (s *service) insertTimelineRecord(userID int, bookID int) (int, error) {
 func (s *service) selectBooksFromUser(userID int) ([]models.Book, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	query := `SELECT b.id, b.title, b.author, b.editorial FROM books 
-		b INNER JOIN timeline_records tr ON b.id = tr.book_id WHERE tr.user_id = $1
+	query := `SELECT b.id, v.title, v.author, v.editorial FROM volumes v INNER JOIN books 
+		b ON v.id = b.volume_id INNER JOIN timeline_records tr ON b.id = tr.book_id WHERE tr.user_id = $1
 		ORDER BY tr.creation_date DESC`
 	rows, err := s.db.QueryContext(ctx, query, userID)
 	if err != nil {
@@ -197,9 +230,9 @@ func (s *service) selectBooksFromUser(userID int) ([]models.Book, error) {
 func (s *service) selectBookByID(bookID int) (models.Book, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
-	query := `SELECT id, title, author, editorial FROM books WHERE id = $1`
+	query := `SELECT b.id, v.title, v.author, v.editorial v,isbn FROM volumes v INNER JOIN books b ON v.id = b.volume_id WHERE b.id = $1`
 	var book models.Book
-	err := s.db.QueryRowContext(ctx, query, bookID).Scan(&book.ID, &book.Title, &book.Author, &book.Editorial)
+	err := s.db.QueryRowContext(ctx, query, bookID).Scan(&book.ID, &book.Title, &book.Author, &book.Editorial, &book.ISBN)
 	if err != nil {
 		return models.Book{}, err
 	}

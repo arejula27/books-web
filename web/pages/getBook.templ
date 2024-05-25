@@ -1,0 +1,15 @@
+package pages
+
+import "books/web/layouts"
+import "strconv"
+
+type GetBookPageProps struct {
+	UserID int
+}
+
+templ GetBookPage(props GetBookPageProps) {
+	@layouts.Base() {
+		<h1>Get Book</h1>
+		<p>{ strconv.Itoa(props.UserID) }</p>
+	}
+}

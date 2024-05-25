@@ -14,7 +14,10 @@ func (s *Router) HomePageHandler(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	component := pages.HomePage(user, books)
+	props := pages.HomePageProps{
+		User:  user,
+		Books: books}
+	component := pages.HomePage(props)
 	return component.Render(c.Request().Context(), c.Response())
 }
 
@@ -37,5 +40,15 @@ func (s *Router) BookPageHandler(c echo.Context) error {
 	}
 
 	component := pages.TimelinePage(props)
+	return component.Render(c.Request().Context(), c.Response())
+}
+
+func (S *Router) GetBookHandler(c echo.Context) error {
+	user := c.Get("user").(models.User)
+
+	props := pages.GetBookPageProps{
+		UserID: user.ID,
+	}
+	component := pages.GetBookPage(props)
 	return component.Render(c.Request().Context(), c.Response())
 }

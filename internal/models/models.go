@@ -15,6 +15,7 @@ type Book struct {
 	Title     string
 	Author    string
 	Editorial string
+	ISBN      string
 }
 
 type Review struct {
