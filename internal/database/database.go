@@ -3,12 +3,10 @@ package database
 
 import (
 	"books/internal/models"
-	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib" // initialize pgx driver
 	"github.com/joho/godotenv"
@@ -102,94 +100,4 @@ func New(opts ...OptFunc) Service {
 	}
 
 	return s
-}
-
-func (s *service) logMsg(msg string) {
-	if s.verbose {
-		log.Println(msg)
-	}
-}
-
-func (s *service) Connect() error {
-	db, err := sql.Open("pgx", s.connStr)
-	if err != nil {
-		return err
-	}
-	s.db = db
-
-	if s.reset == "true" && s.appEnv != "production" {
-		s.logMsg("resetting database")
-		s.clearDatabase()
-		s.createTables()
-
-		//populate default tags
-		defaultTags := []string{"fiction", "terror", "classic", "romance", "sci-fiction", "mystery", "thriller", "biography", "fantasy", "non-fiction"}
-		err := s.insertTags(defaultTags)
-		if nil != err {
-			return err
-		}
-	}
-
-	return nil
-
-}
-
-// Health checks the health of the database, returns a map with a message or stops the application if the database is down
-func (s *service) Health() map[string]string {
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
-
-	err := s.db.PingContext(ctx)
-	if err != nil {
-		log.Fatalf(fmt.Sprintf("db down: %v", err))
-	}
-
-	return map[string]string{
-		"message": "It's healthy",
-	}
-}
-
-// TODO: change parameter to models.User
-func (s *service) AddUserIfNotExists(email, name, imageURL string) (int, error) {
-	//check if user exists
-	user, err := s.getUserByEmail(email)
-
-	if nil == err {
-		//if user exists return no error
-		return user.ID, nil
-	} else if sql.ErrNoRows == err {
-		//if user does not exist insert user
-		userID, err := s.insertUser(email, name, imageURL)
-		if nil != err {
-			return 0, err
-		}
-		return userID, nil
-	}
-	//return error
-	return 0, err
-}
-func (s *service) GetBooksFromUser(userID int) ([]models.Book, error) {
-	//get books from user
-	books, err := s.selectBooksFromUser(userID)
-	if nil != err {
-		return nil, err
-	}
-
-	return books, nil
-}
-
-func (s *service) GetBookByID(bookID int) (models.Book, error) {
-	book, err := s.selectBookByID(bookID)
-	if nil != err {
-		return models.Book{}, err
-	}
-	return book, nil
-}
-
-func (s *service) GetReviewsByBookID(bookID int) ([]models.Review, error) {
-	reviews, err := s.selectReviewsByBookID(bookID)
-	if nil != err {
-		return nil, err
-	}
-	return reviews, nil
 }
