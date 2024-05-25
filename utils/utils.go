@@ -23,12 +23,11 @@ type testData struct {
 
 func LoadEnv() {
 	//load .env file
+	log.Println("Loading .env file")
 	err := godotenv.Load("../../.env.test")
 	if err != nil {
 		log.Println("Error loading .env file")
-		log.Println("===================")
 		log.Println(err)
-		log.Println("===================")
 
 	}
 }
