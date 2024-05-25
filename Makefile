@@ -16,12 +16,17 @@ run:
 # Test the application
 test:
 	@echo "Testing..."
-	@go test ./... -v -p 1
+	@go test ./... -v - 1
+
+coverage:
+	@echo "Testing..."
+	@go test   ./... -covermode=count -p 1 -coverprofile cover.out -v 
+	@go tool cover -html=cover.out
 
 # Clean the binary
 clean:
 	@echo "Cleaning..."
-	@rm -f main
+	@rm -f main cover.*
 
 # Live Reload
 watch:

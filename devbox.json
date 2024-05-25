@@ -21,6 +21,9 @@
       "watch": [
         "make watch",
       ],
+     "cover": [
+        "make coverage",
+      ],
     },
   },
 }
