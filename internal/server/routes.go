@@ -35,7 +35,7 @@ func (s *Router) RegisterRoutes() http.Handler {
 	//Private pages routes
 	pr := e.Group("", s.authorizationMiddleware)
 	pr.GET("/home", s.HomePageHandler)
-	pr.GET("/addBook", echo.WrapHandler(templ.Handler(pages.AddBookPage())))
+	pr.GET("/addBook", s.AddBookPageHandler)
 	pr.GET("/book/:id", s.BookPageHandler)
 	pr.GET("/getBook", s.GetBookHandler)
 

@@ -21,6 +21,11 @@ func (s *Router) HomePageHandler(c echo.Context) error {
 	return component.Render(c.Request().Context(), c.Response())
 }
 
+func (s *Router) AddBookPageHandler(c echo.Context) error {
+	component := pages.AddBookPage()
+	return component.Render(c.Request().Context(), c.Response())
+}
+
 func (s *Router) BookPageHandler(c echo.Context) error {
 	id := c.Param("id")
 	bookID, err := strconv.Atoi(id)

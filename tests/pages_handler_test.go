@@ -62,6 +62,28 @@ func TestHomePage(t *testing.T) {
 	})
 }
 
+func TestAddBookPage(t *testing.T) {
+	////////////////////////////////////////
+	// Setup server
+	////////////////////////////////////////
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/addBook", nil)
+	resp := httptest.NewRecorder()
+	c := e.NewContext(req, resp)
+	server := server.NewRouter()
+
+	////////////////////////////////////////
+	// Assertions
+	////////////////////////////////////////
+	if err := server.AddBookPageHandler(c); err != nil {
+		t.Errorf("handler() error = %v", err)
+		return
+	}
+	if resp.Code != http.StatusOK {
+		t.Errorf("handler() wrong status code = %v", resp.Code)
+		return
+	}
+}
 func TestBookPage(t *testing.T) {
 	////////////////////////////////////////
 	/////Setup database
