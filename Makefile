@@ -18,9 +18,9 @@ test:
 	@echo "Testing..."
 	@go test ./... -v - 1
 
-coverage:
+cover:
 	@echo "Testing..."
-	@go test   ./... -covermode=count -p 1 -coverprofile cover.out -v 
+	@go test -p 1 -v  -covermode=count -coverprofile=cover.out ./... -coverpkg ./... 
 	@go tool cover -html=cover.out
 
 # Clean the binary
